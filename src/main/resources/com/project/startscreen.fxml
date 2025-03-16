@@ -22,10 +22,10 @@
             <Font name="Century Schoolbook" size="21.0" />
          </font>
       </Text>
-      <VBox layoutX="108.0" layoutY="275.0" prefHeight="116.0" prefWidth="198.0" style="-fx-spacing: 10px;">
+      <VBox layoutX="108.0" layoutY="283.0" prefHeight="116.0" prefWidth="198.0" style="-fx-spacing: 10px;">
          <children>
-            <Button fx:id="ButtonLogin" maxWidth="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" style="-fx-border-color: grey; -fx-border-radius: 10px; -fx-background-color: #fff8e1; -fx-padding: 10px 20px; -fx-background-radius: 10px;" text="SIGN IN" />
-            <Button fx:id="ButtonSignUp" maxWidth="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10px; -fx-padding: 10px 20px; -fx-background-radius: 10px;" text="SIGN UP" />
+            <Button fx:id="ButtonLogin" maxWidth="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" style="-fx-border-color: grey; -fx-border-radius: 10px; -fx-background-color: #fff8e1; -fx-padding: 10px 20px; -fx-background-radius: 10px;" text="Zaloguj" />
+            <Button fx:id="ButtonSignUp" maxWidth="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10px; -fx-padding: 10px 20px; -fx-background-radius: 10px;" text="Zarejestruj" />
          </children>
       </VBox>
    </children>
