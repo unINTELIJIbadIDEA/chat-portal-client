@@ -5,7 +5,7 @@ import com.project.utils.Message;
 
 import java.io.*;
 import java.net.Socket;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -23,12 +23,7 @@ public class ClientSession {
     private volatile boolean running = true;
 
     private final int senderId;
-    private String chatId;
-
-    public ClientSession() {
-        this.executor = Executors.newSingleThreadExecutor();
-        this.senderId = SENDER_ID++;
-    }
+    private final String chatId;
 
     public ClientSession(String chatId) {
         this.executor = Executors.newSingleThreadExecutor();
@@ -73,7 +68,7 @@ public class ClientSession {
     }
 
     private void sendMessage(String messageContent) throws IOException {
-        Message message = new Message(MESSAGE_ID++, chatId, senderId, messageContent, LocalDate.now());
+        Message message = new Message(MESSAGE_ID++, chatId, senderId, messageContent, LocalDateTime.now());
         out.writeObject(message);
         out.flush();
     }
@@ -111,7 +106,7 @@ public class ClientSession {
 
     public static void main(String[] args) {
 
-        ClientSession client = new ClientSession("inne");
+        ClientSession client = new ClientSession("cosik");
         client.startSession();
 
     }
