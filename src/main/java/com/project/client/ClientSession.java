@@ -1,5 +1,6 @@
 package com.project.client;
 
+import com.project.server.ServerProperties;
 import com.project.utils.Message;
 
 import java.io.*;
@@ -10,26 +11,41 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Client {
+public class ClientSession {
 
-    private int port;
+    private static int MESSAGE_ID = 1;
+    private static int SENDER_ID = 1;
+
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor;
     private volatile boolean running = true;
 
-    public Client(int port) {
+    private final int senderId;
+    private String chatId;
 
-        this.port = port;
+    public ClientSession() {
+        this.executor = Executors.newSingleThreadExecutor();
+        this.senderId = SENDER_ID++;
+    }
+
+    public ClientSession(String chatId) {
+        this.executor = Executors.newSingleThreadExecutor();
+        this.senderId = SENDER_ID++;
+        this.chatId = chatId;
     }
 
     public void startSession() {
 
         try {
-            socket = new Socket("localhost", port);
+            socket = new Socket(ServerProperties.HOST, ServerProperties.PORT);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
+
+            if (chatId != null) {
+                sendMessage("/join " + chatId);
+            }
 
             executor.submit(receiveMessages());
             sendMessages();
@@ -46,19 +62,21 @@ public class Client {
         try (Scanner scanner = new Scanner(System.in)) {
             while (running) {
                 String messageContent = scanner.nextLine();
-                Message message = new Message(1, 0,1, messageContent, LocalDate.now());
                 if (messageContent.equalsIgnoreCase("exit")) {
                     endSession();
-                    break;
                 }
-                out.writeObject(message);
-                out.flush();
+                sendMessage(messageContent);
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
 
+    private void sendMessage(String messageContent) throws IOException {
+        Message message = new Message(MESSAGE_ID++, chatId, senderId, messageContent, LocalDate.now());
+        out.writeObject(message);
+        out.flush();
+    }
 
 
     private Callable<Void> receiveMessages() {
@@ -93,7 +111,7 @@ public class Client {
 
     public static void main(String[] args) {
 
-        Client client = new Client(2137);
+        ClientSession client = new ClientSession("inne");
         client.startSession();
 
     }
