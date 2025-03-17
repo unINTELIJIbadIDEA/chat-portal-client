@@ -1,10 +1,10 @@
 package com.project.client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import com.project.utils.Message;
+
+import java.io.*;
 import java.net.Socket;
+import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -14,8 +14,8 @@ public class Client {
 
     private int port;
     private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private volatile boolean running = true;
 
@@ -26,11 +26,10 @@ public class Client {
 
     public void startSession() {
 
-        try (Socket tempSocket = new Socket("localhost", port)){
-
+        try {
             socket = new Socket("localhost", port);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
 
             executor.submit(receiveMessages());
             sendMessages();
@@ -46,25 +45,32 @@ public class Client {
     private void sendMessages() {
         try (Scanner scanner = new Scanner(System.in)) {
             while (running) {
-                String message = scanner.nextLine();
-                if (message.equalsIgnoreCase("exit")) {
+                String messageContent = scanner.nextLine();
+                Message message = new Message(1, 0,1, messageContent, LocalDate.now());
+                if (messageContent.equalsIgnoreCase("exit")) {
                     endSession();
                     break;
                 }
-                out.println(message);
+                out.writeObject(message);
+                out.flush();
             }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
     }
+
+
 
     private Callable<Void> receiveMessages() {
         return () -> {
             try {
-                String message;
-                while (running && (message = in.readLine()) != null) {
+                Message message;
+                while (running && (message = (Message) in.readObject()) != null) {
                     System.out.println(message);
                 }
             } catch (IOException e) {
                 System.out.println("Connection closed.");
+                running = false;
             }
             return null;
         };
@@ -76,10 +82,11 @@ public class Client {
             if (socket != null && !socket.isClosed()) {
                 socket.close();
             }
-            executor.shutdownNow();
             System.out.println("Client disconnected.");
         } catch (IOException e) {
             System.out.println("Error closing client: " + e.getMessage());
+        } finally {
+            executor.shutdown();
         }
     }
 
