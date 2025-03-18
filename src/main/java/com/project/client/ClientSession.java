@@ -106,7 +106,7 @@ public class ClientSession {
 
     public static void main(String[] args) {
 
-        ClientSession client = new ClientSession("cosik");
+        ClientSession client = new ClientSession("test");
         client.startSession();
 
     }
