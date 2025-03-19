@@ -11,6 +11,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+// STARA KLASA KTÓRĄ PRZEBUDOWAŁEM (DZIAŁA I MOŻNA UŻYWAĆ DO TESTÓW)
+@Deprecated
 public class ClientSession {
 
     private static int MESSAGE_ID = 1;
