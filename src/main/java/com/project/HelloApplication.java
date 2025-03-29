@@ -17,14 +17,10 @@ public class HelloApplication extends Application {
         stage.setTitle("TextPortal");
         stage.setScene(scene);
         stage.show();
-        UsersHandler h = new UsersHandler();
-        System.out.println(h.getQueryParams("id=5&source=mobile"));
     }
 
     public static void main(String[] args) {
 
         launch();
-
-
     }
 }
