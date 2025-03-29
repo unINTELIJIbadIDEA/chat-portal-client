@@ -28,5 +28,6 @@
             <Button fx:id="ButtonSignUp" maxWidth="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10px; -fx-padding: 10px 20px; -fx-background-radius: 10px;" text="Zarejestruj" />
          </children>
       </VBox>
+      <Button text="test" onAction="#test"/>
    </children>
 </AnchorPane>
