@@ -1,11 +1,13 @@
 package com.project;
 
+import com.project.apiServer.UsersHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URI;
 
 public class HelloApplication extends Application {
     @Override
@@ -15,11 +17,14 @@ public class HelloApplication extends Application {
         stage.setTitle("TextPortal");
         stage.setScene(scene);
         stage.show();
-
+        UsersHandler h = new UsersHandler();
+        System.out.println(h.getQueryParams("id=5&source=mobile"));
     }
 
     public static void main(String[] args) {
 
         launch();
+
+
     }
 }
