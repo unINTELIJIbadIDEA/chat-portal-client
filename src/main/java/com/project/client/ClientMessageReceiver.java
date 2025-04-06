@@ -1,6 +1,6 @@
 package com.project.client;
 
-import com.project.utils.Message;
+import com.project.models.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 

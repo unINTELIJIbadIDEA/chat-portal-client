@@ -1,6 +1,7 @@
 package com.project.client;
 
-import com.project.server.ServerProperties;
+import com.project.utils.Config;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -10,7 +11,7 @@ public class ClientConnection {
     private ObjectInputStream inputStream;
 
     public void connect() throws IOException {
-        socket = new Socket(ServerProperties.HOST, ServerProperties.PORT);
+        socket = new Socket(Config.getHOST_SERVER(), Config.getPORT_SERVER());
         outputStream = new ObjectOutputStream(socket.getOutputStream());
         outputStream.flush();
         inputStream = new ObjectInputStream(socket.getInputStream());

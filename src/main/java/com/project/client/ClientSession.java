@@ -1,7 +1,7 @@
 package com.project.client;
 
-import com.project.server.ServerProperties;
-import com.project.utils.Message;
+import com.project.utils.Config;
+import com.project.models.Message;
 
 import java.io.*;
 import java.net.Socket;
@@ -37,7 +37,7 @@ public class ClientSession {
     public void startSession() {
 
         try {
-            socket = new Socket(ServerProperties.HOST, ServerProperties.PORT);
+            socket = new Socket(Config.getHOST_SERVER(), Config.getPORT_SERVER());
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 

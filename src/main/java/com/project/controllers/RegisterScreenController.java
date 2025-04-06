@@ -1,4 +1,5 @@
-package com.project;
+package com.project.controllers;
+import com.project.HelloApplication;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
