@@ -1,7 +1,7 @@
 package com.project.client;
 
 import com.project.utils.Config;
-import com.project.models.Message;
+import com.project.models.message.Message;
 
 import java.io.*;
 import java.net.Socket;

@@ -3,7 +3,6 @@ package com.project.client;
 import java.io.IOException;
 import java.util.Scanner;
 
-// klasa na razie potrzebna dopóki nie ma GUI w przyszłości do wyrzucenia (będzie trzeba przebudować wtedy lekko ClientSessionManager)
 public class UserInputHandler {
     private final ClientMessageSender messageSender;
     private final ClientSessionManager sessionManager;
@@ -27,9 +26,10 @@ public class UserInputHandler {
             sessionManager.endSession();
         } else {
             try {
-                messageSender.sendMessage(input);
+                String token = sessionManager.getToken();
+                messageSender.sendMessage(input, token);
             } catch (IOException e) {
-                System.out.println("Error sending message: " + e.getMessage());
+                System.out.println("Błąd podczas wysyłania wiadomości: " + e.getMessage());
             }
         }
     }

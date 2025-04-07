@@ -1,30 +1,20 @@
 package com.project.client;
 
-import com.project.models.Message;
+import com.project.models.message.ClientMessage;
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 public class ClientMessageSender {
     private final ClientConnection connection;
     private final String chatId;
-    private final int senderId;
-    private int messageId = 1;
 
-    public ClientMessageSender(ClientConnection connection, String chatId, int senderId) {
+    public ClientMessageSender(ClientConnection connection, String chatId) {
         this.connection = connection;
         this.chatId = chatId;
-        this.senderId = senderId;
     }
 
-    public void sendMessage(String content) throws IOException {
-        Message message = new Message(
-                messageId++,
-                chatId,
-                senderId,
-                content,
-                LocalDateTime.now()
-        );
-        connection.getOutputStream().writeObject(message);
+    public void sendMessage(String content, String token) throws IOException {
+        ClientMessage clientMessage = new ClientMessage(content, chatId, token);
+        connection.getOutputStream().writeObject(clientMessage);
         connection.getOutputStream().flush();
     }
 }
