@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="loginscreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="634.0" prefWidth="597.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.RegisterScreenController">
+<AnchorPane id="loginscreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="634.0" prefWidth="597.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.RegisterScreenController">
    <children>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#8398ac" height="607.0" layoutX="21.0" layoutY="14.0" opacity="0.27" stroke="BLACK" strokeType="INSIDE" style="-fx-arc-width: 200px; -fx-arc-height: 50px;" width="555.0" />
       <ImageView fitHeight="71.0" fitWidth="91.0" layoutX="253.0" layoutY="549.0">
