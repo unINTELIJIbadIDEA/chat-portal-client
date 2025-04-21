@@ -1,4 +1,5 @@
-package com.project;
+package com.project.controllers;
+import com.project.HelloApplication;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,9 +12,10 @@ import javafx.util.Duration;
 
 import java.net.URL;
 
-public class LoginScreenController {
+
+public class RegisterScreenController {
     @FXML
-    private Button loginButton;
+    private Button registerButton;
 
     @FXML
     private Button backButton;
@@ -21,13 +23,13 @@ public class LoginScreenController {
     @FXML
     private void initialize() {
         // Dodaj akcje dla przycisków
-        loginButton.setOnAction(event -> handleLoginAction());
+        registerButton.setOnAction(event -> handleLoginAction());
         backButton.setOnAction(event -> handleBackAction());
 
-        loginButton.setOnMouseEntered(this::onMouseEntered);
-        loginButton.setOnMouseExited(this::onMouseExited);
-        loginButton.setOnMousePressed(this::onMousePressed);
-        loginButton.setOnMouseReleased(this::onMouseReleased);
+        registerButton.setOnMouseEntered(this::onMouseEntered);
+        registerButton.setOnMouseExited(this::onMouseExited);
+        registerButton.setOnMousePressed(this::onMousePressed);
+        registerButton.setOnMouseReleased(this::onMouseReleased);
 
         backButton.setOnMouseEntered(this::onMouseEntered);
         backButton.setOnMouseExited(this::onMouseExited);
@@ -35,22 +37,11 @@ public class LoginScreenController {
         backButton.setOnMouseReleased(this::onMouseReleased);
     }
 
-    // Akcja dla przycisku "Zaloguj"
+    // Akcja dla przycisku "Zarejestruj"
     @FXML
     private void handleLoginAction() {
-        System.out.println("Zalogowano!");
-        try {
-            URL resource = HelloApplication.class.getResource("textwelcome.fxml");
-            FXMLLoader fxmlLoader = new FXMLLoader(resource);
-            AnchorPane textwelcome = fxmlLoader.load();
-            Stage stage = (Stage) loginButton.getScene().getWindow();
-            stage.setScene(new Scene(textwelcome));
-            stage.setMaximized(true);
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        System.out.println("Zarejestrowano!");
+        // Dodaj logikę logowania (np. sprawdzenie danych logowania)
     }
 
     // Akcja dla przycisku "Powrót"

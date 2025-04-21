@@ -1,4 +1,5 @@
-package com.project;
+package com.project.controllers;
+import com.project.HelloApplication;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,10 +12,9 @@ import javafx.util.Duration;
 
 import java.net.URL;
 
-
-public class RegisterScreenController {
+public class LoginScreenController {
     @FXML
-    private Button registerButton;
+    private Button loginButton;
 
     @FXML
     private Button backButton;
@@ -22,13 +22,13 @@ public class RegisterScreenController {
     @FXML
     private void initialize() {
         // Dodaj akcje dla przycisków
-        registerButton.setOnAction(event -> handleLoginAction());
+        loginButton.setOnAction(event -> handleLoginAction());
         backButton.setOnAction(event -> handleBackAction());
 
-        registerButton.setOnMouseEntered(this::onMouseEntered);
-        registerButton.setOnMouseExited(this::onMouseExited);
-        registerButton.setOnMousePressed(this::onMousePressed);
-        registerButton.setOnMouseReleased(this::onMouseReleased);
+        loginButton.setOnMouseEntered(this::onMouseEntered);
+        loginButton.setOnMouseExited(this::onMouseExited);
+        loginButton.setOnMousePressed(this::onMousePressed);
+        loginButton.setOnMouseReleased(this::onMouseReleased);
 
         backButton.setOnMouseEntered(this::onMouseEntered);
         backButton.setOnMouseExited(this::onMouseExited);
@@ -36,11 +36,22 @@ public class RegisterScreenController {
         backButton.setOnMouseReleased(this::onMouseReleased);
     }
 
-    // Akcja dla przycisku "Zarejestruj"
+    // Akcja dla przycisku "Zaloguj"
     @FXML
     private void handleLoginAction() {
-        System.out.println("Zarejestrowano!");
-        // Dodaj logikę logowania (np. sprawdzenie danych logowania)
+        System.out.println("Zalogowano!");
+        try {
+            URL resource = HelloApplication.class.getResource("textwelcome.fxml");
+            FXMLLoader fxmlLoader = new FXMLLoader(resource);
+            AnchorPane textwelcome = fxmlLoader.load();
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            stage.setScene(new Scene(textwelcome));
+            stage.setMaximized(true);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     // Akcja dla przycisku "Powrót"

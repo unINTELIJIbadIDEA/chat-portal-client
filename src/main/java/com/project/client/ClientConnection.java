@@ -1,6 +1,6 @@
 package com.project.client;
 
-import com.project.server.ServerProperties;
+import com.project.utils.Config;
 import java.io.*;
 import java.net.Socket;
 
@@ -10,7 +10,7 @@ public class ClientConnection {
     private ObjectInputStream inputStream;
 
     public void connect() throws IOException {
-        socket = new Socket(ServerProperties.HOST, ServerProperties.PORT);
+        socket = new Socket(Config.getHOST_SERVER(), Config.getPORT_SERVER());
         outputStream = new ObjectOutputStream(socket.getOutputStream());
         outputStream.flush();
         inputStream = new ObjectInputStream(socket.getInputStream());
@@ -18,11 +18,25 @@ public class ClientConnection {
 
     public void disconnect() {
         try {
-            if (inputStream != null) inputStream.close();
-            if (outputStream != null) outputStream.close();
-            if (socket != null) socket.close();
+            if (inputStream != null) {
+                inputStream.close();
+            }
         } catch (IOException e) {
-            System.out.println("Error closing connection: " + e.getMessage());
+            System.out.println("Error closing input stream: " + e.getMessage());
+        }
+        try {
+            if (outputStream != null) {
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            System.out.println("Error closing output stream: " + e.getMessage());
+        }
+        try {
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            System.out.println("Error closing socket: " + e.getMessage());
         }
     }
 
