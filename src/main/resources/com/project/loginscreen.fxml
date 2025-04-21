@@ -14,7 +14,7 @@
 
 <AnchorPane id="loginscreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="415.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.LoginScreenController">
    <children>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#8398ac" height="439.0" layoutX="17.0" layoutY="16.0" opacity="0.27" stroke="BLACK" strokeType="INSIDE" style="-fx-arc-width: 200px; -fx-arc-height: 50px;" width="380.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#455a64" height="439.0" layoutX="17.0" layoutY="16.0" opacity="1" stroke="BLACK" strokeType="INSIDE" style="-fx-arc-width: 200px; -fx-arc-height: 50px;" width="380.0" />
       <ImageView fitHeight="71.0" fitWidth="91.0" layoutX="163.0" layoutY="371.0">
          <image>
             <Image url="@../../image/logo.png" />
