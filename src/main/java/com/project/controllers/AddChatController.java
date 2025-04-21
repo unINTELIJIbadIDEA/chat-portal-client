@@ -1,4 +1,4 @@
-package com.project;
+package com.project.controllers;
 
 public class AddChatController {
 }

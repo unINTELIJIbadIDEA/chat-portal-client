@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="TextWelcome" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="894.0" prefWidth="1685.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.TextWelcomeController">
+<AnchorPane fx:id="TextWelcome" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="894.0" prefWidth="1685.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.TextWelcomeController">
    <children>
       <Label fx:id="welcomeLabel" layoutX="491.0" layoutY="405.0"  text="WITAJ NA TEXTPORTALU!!" textFill="WHITE">
          <font>

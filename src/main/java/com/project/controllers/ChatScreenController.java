@@ -1,5 +1,6 @@
-package com.project;
+package com.project.controllers;
 
+import com.project.HelloApplication;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,6 +13,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class ChatScreenController {
 
@@ -38,7 +40,8 @@ public class ChatScreenController {
 
     private void loadChat(String chatName) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("chat.fxml"));
+            URL resource = HelloApplication.class.getResource("chat.fxml");
+            FXMLLoader loader = new FXMLLoader(resource);
             AnchorPane chatPane = loader.load();
 
             ChatController controller = loader.getController();

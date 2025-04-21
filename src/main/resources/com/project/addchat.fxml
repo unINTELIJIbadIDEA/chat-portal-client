@@ -8,7 +8,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane id="addchat" prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.AddChatController">
+<AnchorPane id="addchat" prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.AddChatController">
    <children>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#455a64" height="170.0" layoutX="14.0" layoutY="15.0" stroke="#455a64" strokeType="INSIDE" style="-fx-arc-height: 200px; -fx-arc-width: 50px;" width="374.0" />
       <TextField fx:id="idchatField" layoutX="46.0" layoutY="94.0" prefHeight="26.0" prefWidth="307.0" />

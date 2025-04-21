@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="chatscreen" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.ChatScreenController">
+<AnchorPane id="chatscreen" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.ChatScreenController">
    <children>
       <BorderPane layoutX="5.0" layoutY="5.0" prefHeight="795.0" prefWidth="1530.0">
          <top>
