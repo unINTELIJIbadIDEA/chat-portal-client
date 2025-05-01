@@ -3,6 +3,7 @@ import com.project.HelloApplication;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
@@ -36,14 +37,13 @@ public class LoginScreenController {
         backButton.setOnMouseReleased(this::onMouseReleased);
     }
 
-    // Akcja dla przycisku "Zaloguj"
     @FXML
     private void handleLoginAction() {
         System.out.println("Zalogowano!");
         try {
             URL resource = HelloApplication.class.getResource("textwelcome.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(resource);
-            AnchorPane textwelcome = fxmlLoader.load();
+            Parent textwelcome = fxmlLoader.load();
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(new Scene(textwelcome));
             stage.setMaximized(true);
@@ -51,7 +51,6 @@ public class LoginScreenController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     // Akcja dla przycisku "Powrót"
