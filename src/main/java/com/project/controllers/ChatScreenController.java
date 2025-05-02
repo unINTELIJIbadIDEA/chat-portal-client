@@ -59,7 +59,7 @@ public class ChatScreenController {
     @FXML
     private void handleAddChatButton() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/project/AddChat.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/project/sectionchat.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();
