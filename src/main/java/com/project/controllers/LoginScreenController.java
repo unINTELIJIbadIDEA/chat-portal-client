@@ -1,5 +1,5 @@
 package com.project.controllers;
-import com.project.HelloApplication;
+import com.project.ChatPortal;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -48,7 +48,7 @@ public class LoginScreenController {
     private void handleBackAction() {
         System.out.println("Powrót do poprzedniego ekranu.");
         try {
-            URL resource = HelloApplication.class.getResource("startscreen.fxml");
+            URL resource = ChatPortal.class.getResource("startscreen.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(resource);
             AnchorPane loginScreen = fxmlLoader.load();
             Stage stage = (Stage) backButton.getScene().getWindow();
