@@ -1,5 +1,5 @@
 package com.project.controllers;
-import com.project.HelloApplication;
+import com.project.ChatPortal;
 import javafx.animation.ScaleTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -47,7 +47,7 @@ public class StartScreenController {
     private void handleSignIn() {
         System.out.println("Przycisk SIGN IN kliknięty");
         try {
-            URL resource = HelloApplication.class.getResource("loginscreen.fxml");
+            URL resource = ChatPortal.class.getResource("loginscreen.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(resource);
             AnchorPane loginScreen = fxmlLoader.load();
             Stage stage = (Stage) ButtonLogin.getScene().getWindow();
@@ -62,7 +62,7 @@ public class StartScreenController {
     private void handleSignUp() {
         System.out.println("Przycisk SIGN UP kliknięty");
         try {
-            URL resource = HelloApplication.class.getResource("registerscreen.fxml");
+            URL resource = ChatPortal.class.getResource("registerscreen.fxml");
             FXMLLoader fxmlLoader = new FXMLLoader(resource);
             AnchorPane loginScreen = fxmlLoader.load();
             Stage stage = (Stage) ButtonSignUp.getScene().getWindow();
