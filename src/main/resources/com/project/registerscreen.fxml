@@ -27,43 +27,43 @@
                   <Font size="22.0" />
                </font>
             </Label>
-            <TextField prefHeight="26.0" prefWidth="223.0" promptText="Imię użytkownika" style="-fx-background-color: #fff8e1;" />
+            <TextField fx:id="nameField" prefHeight="26.0" prefWidth="223.0" promptText="Imię użytkownika" style="-fx-background-color: #fff8e1;" />
             <Label text="Nazwisko" textFill="WHITE">
                <font>
                   <Font size="22.0" />
                </font>
             </Label>
-            <TextField promptText="Nazwisko użytkownika" style="-fx-background-color: #fff8e1;" />
+            <TextField fx:id="surnameField" promptText="Nazwisko użytkownika" style="-fx-background-color: #fff8e1;" />
             <Label text="Nazwa użytkownika" textFill="WHITE">
                <font>
                   <Font size="22.0" />
                </font>
             </Label>
-            <TextField promptText="Pseudonim użytkownika" style="-fx-background-color: #fff8e1;" />
+            <TextField fx:id="nicknameField" promptText="Pseudonim użytkownika" style="-fx-background-color: #fff8e1;" />
             <Label text="E-mail" textFill="WHITE">
                <font>
                   <Font size="22.0" />
                </font>
             </Label>
-            <TextField promptText="\@..." style="-fx-background-color: #fff8e1;" />
+            <TextField fx:id="emailField" promptText="\@..." style="-fx-background-color: #fff8e1;" />
             <Label text="Data urodzenia" textFill="WHITE">
                <font>
                   <Font size="22.0" />
                </font>
             </Label>
-            <DatePicker prefHeight="26.0" prefWidth="518.0" promptText="Data urodzenia użytkownika" style="-fx-background-color: #fff8e1;" />
+            <DatePicker fx:id="birthdayPicker" prefHeight="26.0" prefWidth="518.0" promptText="Data urodzenia użytkownika" style="-fx-background-color: #fff8e1;" />
             <Label text="Hasło" textFill="WHITE">
                <font>
                   <Font size="22.0" />
                </font>
             </Label>
-            <PasswordField promptText="Hasło użytkownika" style="-fx-background-color: #fff8e1;" />
+            <PasswordField fx:id="passwordField" promptText="Hasło użytkownika" style="-fx-background-color: #fff8e1;" />
             <Label text="Powtórz hasło" textFill="WHITE">
                <font>
                   <Font size="22.0" />
                </font>
             </Label>
-            <PasswordField prefHeight="23.0" prefWidth="515.0" promptText="Powtórz hasło użytkownika" style="-fx-background-color: #fff8e1;" />
+            <PasswordField fx:id="confirmPasswordField" prefHeight="23.0" prefWidth="515.0" promptText="Powtórz hasło użytkownika" style="-fx-background-color: #fff8e1;" />
          </children>
       </VBox>
       <Button fx:id="registerButton" layoutX="344.0" layoutY="564.0" mnemonicParsing="false" prefHeight="16.0" prefWidth="162.0" style="-fx-border-color: grey; -fx-border-radius: 10px; -fx-background-color: #fff8e1; -fx-background-radius: 10px;" text="Zarejestruj" />

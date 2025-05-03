@@ -132,7 +132,7 @@ public class LoginScreenController {
     private void onMousePressed(MouseEvent event) {
         Button button = (Button) event.getSource();
         ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(150), button);
-        scaleTransition.setToX(0.9); // Zmniejsz przycisk
+        scaleTransition.setToX(0.9);
         scaleTransition.setToY(0.9);
         scaleTransition.play();
     }
@@ -140,7 +140,7 @@ public class LoginScreenController {
     private void onMouseReleased(MouseEvent event) {
         Button button = (Button) event.getSource();
         ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(150), button);
-        scaleTransition.setToX(1.0); // Przywróć oryginalny rozmiar
+        scaleTransition.setToX(1.0);
         scaleTransition.setToY(1.0);
         scaleTransition.play();
     }
