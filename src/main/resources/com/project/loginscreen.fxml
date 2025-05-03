@@ -35,7 +35,7 @@
                   <Insets />
                </opaqueInsets>
             </Label>
-            <TextField promptText="Nazwa użytkownika" style="-fx-background-color: #fff8e1;">
+            <TextField fx:id="usernameField" promptText="Nazwa użytkownika" style="-fx-background-color: #fff8e1;">
                <font>
                   <Font size="11.0" />
                </font>
@@ -45,7 +45,7 @@
                   <Font size="19.0" />
                </font>
             </Label>
-            <PasswordField style="-fx-background-color: #fff8e1;" />
+            <PasswordField fx:id="passwordField" style="-fx-background-color: #fff8e1;" />
          </children>
       </VBox>
       <Button fx:id="backButton" layoutX="35.0" layoutY="391.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10px; -fx-background-radius: 10px;" text="Powrót" />
