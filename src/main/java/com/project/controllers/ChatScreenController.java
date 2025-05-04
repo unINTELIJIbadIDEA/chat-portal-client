@@ -27,6 +27,9 @@ public class ChatScreenController {
     @FXML
     private Button addChatButton;
 
+    @FXML
+    private Button postsButton;
+
     public void initialize() {
         chatListView.getItems().addAll("chat1", "chat2", "chat3");
 
@@ -37,6 +40,7 @@ public class ChatScreenController {
         });
 
         addChatButton.setOnAction(event -> handleAddChatButton());
+        postsButton.setOnAction(event -> handlePostsButton());
     }
 
     private void loadChat(String chatId) {
@@ -76,6 +80,27 @@ public class ChatScreenController {
             // np. chatListView.getItems().add("nowyChatId");
 
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handlePostsButton() {
+        try {
+            URL resource = ChatPortal.class.getResource("postscreen.fxml");
+            FXMLLoader loader = new FXMLLoader(resource);
+            Parent chatRoot = loader.load();
+
+            Scene chatScene = new Scene(chatRoot);
+
+            Stage stage = (Stage) postsButton.getScene().getWindow();
+            stage.setScene(chatScene);
+            stage.setWidth(1920);
+            stage.setHeight(1080);
+            stage.setMaximized(true);
+            stage.show();
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
