@@ -18,6 +18,6 @@
          </children>
       </VBox>
       <TextField fx:id="messageField" layoutX="28.0" layoutY="652.0" prefHeight="46.0" prefWidth="969.0" />
-      <Button fx:id="sendButton" layoutX="1011.0" layoutY="651.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="186.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-background-radius: 5; -fx-border-radius: 5;" text="Wyślij" />
+      <Button fx:id="sendButton" onAction="#sendMessage" layoutX="1011.0" layoutY="651.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="186.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-background-radius: 5; -fx-border-radius: 5;" text="Wyślij" />
    </children>
 </AnchorPane>

@@ -18,28 +18,6 @@ public class Config {
         }
     }
 
-
-    public static String getDbUrl() {
-        return properties.getProperty("db.URL");
-    }
-
-    public static String getDbUsername() {
-        return properties.getProperty("db.Username");
-    }
-
-    public static String getDbPassword() {
-        return properties.getProperty("db.Password");
-    }
-
-
-    public static String getSecretKey() {
-        return properties.getProperty("SECRET_KEY");
-    }
-
-    public static Integer getExpirationTime() {
-        return Integer.parseInt(properties.getProperty("EXPIRATION_TIME"));
-    }
-
     public static Integer getPORT_API() {
         return Integer.parseInt(properties.getProperty("API_PORT"));
     }

@@ -1,6 +1,6 @@
 package com.project.controllers;
 
-import com.project.HelloApplication;
+import com.project.ChatPortal;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
@@ -45,7 +45,7 @@ public class TextWelcomeController {
 
             fadeOut.setOnFinished(e -> {
                 try {
-                    URL resource = HelloApplication.class.getResource("chatscreen.fxml");
+                    URL resource = ChatPortal.class.getResource("chatscreen.fxml");
                     FXMLLoader loader = new FXMLLoader(resource);
                     Parent chatRoot = loader.load();
 
