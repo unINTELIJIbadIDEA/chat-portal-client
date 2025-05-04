@@ -29,7 +29,7 @@ public class ChatScreenController {
     private final String bearerToken = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE3NDYzNTQ1NTgsImV4cCI6MTc0NjM5MDU1OH0.foLg-JGlH5IIJN8hYuXTvsrnr8tp1H5fJrZvC5whTrM";
 
     public void initialize() {
-        chatListView.getItems().addAll("cosik", "chat2", "chat3"); // to są przykładowe chatId
+        chatListView.getItems().addAll("chat1", "chat2", "chat3");
 
         chatListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
