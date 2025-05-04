@@ -2,7 +2,10 @@ package com.project.controllers;
 import com.google.gson.JsonObject;
 import com.project.ChatPortal;
 import com.project.utils.Config;
+import com.project.utils.SessionManager;
+import com.project.utils.TokenExtractor;
 import javafx.animation.ScaleTransition;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,6 +24,8 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class LoginScreenController {
     @FXML
@@ -32,7 +37,8 @@ public class LoginScreenController {
     @FXML
     private Button backButton;
 
-    HttpClient httpClient = HttpClient.newHttpClient();
+    private final ExecutorService executor = Executors.newFixedThreadPool(2);
+    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @FXML
     private void initialize() {
@@ -55,12 +61,26 @@ public class LoginScreenController {
         String email = usernameField.getText().trim();
         String password = passwordField.getText();
 
-        try {
-            HttpResponse<String> response = sendLoginRequest(email, password);
-            processLoginResponse(response);
-        } catch (IOException | InterruptedException e) {
-            System.err.println(e.getMessage());
-        }
+        loginButton.setDisable(true);
+
+        Task<HttpResponse<String>> loginTask = new Task<>() {
+            @Override
+            protected HttpResponse<String> call() throws Exception {
+                return sendLoginRequest(email, password);
+            }
+        };
+
+        loginTask.setOnSucceeded(event -> {
+            loginButton.setDisable(false);
+            processLoginResponse(loginTask.getValue());
+        });
+
+        loginTask.setOnFailed(event -> {
+            loginButton.setDisable(false);
+            System.err.println("Błąd logowania: " + loginTask.getException().getMessage());
+        });
+
+        executor.submit(loginTask);
     }
 
     private HttpResponse<String> sendLoginRequest(String email, String password) throws IOException, InterruptedException {
@@ -87,6 +107,10 @@ public class LoginScreenController {
 
         if (status == 200) {
             try {
+                String token = TokenExtractor.extractToken(body);
+                System.out.println("Token: " + token);
+                SessionManager.getInstance().setToken(token);
+
                 URL resource = ChatPortal.class.getResource("textwelcome.fxml");
                 FXMLLoader fxmlLoader = new FXMLLoader(resource);
                 Parent textwelcome = fxmlLoader.load();

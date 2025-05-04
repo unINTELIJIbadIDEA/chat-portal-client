@@ -1,6 +1,7 @@
 package com.project.controllers;
 
 import com.project.ChatPortal;
+import com.project.utils.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -26,8 +27,6 @@ public class ChatScreenController {
     @FXML
     private Button addChatButton;
 
-    private final String bearerToken = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE3NDYzNTQ1NTgsImV4cCI6MTc0NjM5MDU1OH0.foLg-JGlH5IIJN8hYuXTvsrnr8tp1H5fJrZvC5whTrM";
-
     public void initialize() {
         chatListView.getItems().addAll("chat1", "chat2", "chat3");
 
@@ -47,7 +46,7 @@ public class ChatScreenController {
             AnchorPane chatPane = loader.load();
 
             ChatController controller = loader.getController();
-            controller.setChatSession(chatId, bearerToken); // przekazanie dynamicznego chatId
+            controller.setChatSession(chatId, SessionManager.getInstance().getToken());
 
             chatArea.getChildren().setAll(chatPane);
             AnchorPane.setTopAnchor(chatPane, 0.0);
