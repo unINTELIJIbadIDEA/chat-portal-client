@@ -19,11 +19,12 @@ public class ChatController {
     private Button sendButton;
 
     private ClientSessionManager clientSessionManager;
+    private String bearerToken;
 
-    @FXML
-    public void initialize() {
-        String bearerToken = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjExLCJpYXQiOjE3NDYzNTEzNDIsImV4cCI6MTc0NjM4NzM0Mn0.UpOC2BjYharS3WNM58OTEjho2oNux73iSEIumdBWank";
-        clientSessionManager = new ClientSessionManager("cosik", bearerToken, this::handleMessage);
+    public void setChatSession(String chatId, String bearerToken) {
+        this.bearerToken = bearerToken;
+
+        clientSessionManager = new ClientSessionManager(chatId, bearerToken, this::handleMessage);
         clientSessionManager.startSession();
     }
 
