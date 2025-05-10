@@ -33,7 +33,7 @@
                   <HBox fx:id="addpostArea" spacing="10.0" style="-fx-border-color: #263238;" VBox.vgrow="NEVER">
                      <children>
                         <TextArea fx:id="postTextArea" prefHeight="44.0" prefWidth="872.0" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="mypostscreenButton" mnemonicParsing="false" prefHeight="44.0" prefWidth="198.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10; -fx-background-radius: 10;" text="Dodaj Post">
+                        <Button onAction="#addPostButtonClicked" fx:id="addPostButton" mnemonicParsing="false" prefHeight="44.0" prefWidth="198.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10; -fx-background-radius: 10;" text="Dodaj Post">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -43,10 +43,8 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </HBox>
-                  <ScrollPane fx:id="viewpostArea" VBox.vgrow="ALWAYS">
-                     <content>
-                        <VBox fx:id="locationpostArea" style="-fx-border-color: #263238;" />
-                     </content>
+                  <ScrollPane fx:id="viewpostArea" fitToWidth="true" maxHeight="Infinity" maxWidth="Infinity" VBox.vgrow="ALWAYS">
+                     <VBox fx:id="postsView"/>
                   </ScrollPane>
                </children>
                <BorderPane.margin>

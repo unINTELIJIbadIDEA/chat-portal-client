@@ -29,9 +29,9 @@
             <center>
                 <VBox fx:id="postArea" maxHeight="Infinity" maxWidth="Infinity" spacing="10" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
                     <children>
-                        <ScrollPane fx:id="viewpostArea" fitToHeight="true" fitToWidth="true" maxHeight="Infinity" maxWidth="Infinity" VBox.vgrow="ALWAYS">
+                        <ScrollPane fx:id="viewpostArea" fitToWidth="true" maxHeight="Infinity" maxWidth="Infinity" VBox.vgrow="ALWAYS">
                             <content>
-                                <VBox fx:id="locationpost" maxHeight="Infinity" maxWidth="Infinity" style="-fx-border-color: #263238;" />
+                                <VBox fx:id="postsView" maxHeight="Infinity" maxWidth="Infinity" />
                             </content>
                         </ScrollPane>
                     </children>
