@@ -122,3 +122,16 @@ CREATE TABLE IF NOT EXISTS messages (
     content TEXT NOT NULL,
     time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS conversations (
+                               roomId VARCHAR(100) PRIMARY KEY,
+                               password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS usersConversations (
+                                    userId INT NOT NULL,
+                                    conversationId VARCHAR(100) NOT NULL,
+                                    PRIMARY KEY (userId, conversationId),
+                                    FOREIGN KEY (userId) REFERENCES user(userId),
+                                    FOREIGN KEY (conversationId) REFERENCES conversations(roomId)
+);
