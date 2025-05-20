@@ -70,7 +70,7 @@ public class ForumPostController implements Initializable {
                 HBox wrapper = new HBox(postBox);
                 wrapper.setStyle("-fx-padding: 10px;");
                 wrapper.setMaxWidth(Double.MAX_VALUE);
-                HBox.setHgrow(postBox, Priority.ALWAYS); // <- kluczowy krok!
+                HBox.setHgrow(postBox, Priority.ALWAYS);
 
                 postsView.getChildren().add(wrapper);
             }
