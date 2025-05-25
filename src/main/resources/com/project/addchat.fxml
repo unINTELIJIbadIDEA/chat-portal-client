@@ -9,16 +9,16 @@
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane id="addchat" prefHeight="250.0" prefWidth="400.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.AddChatController">
+<?import java.net.URL?>
+<AnchorPane id="addchat" prefHeight="250.0" prefWidth="400.0" styleClass="root" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.AddChatController">
+   <stylesheets>
+      <URL value="@../../style/styleChat.css" />
+   </stylesheets>
    <children>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#455a64" height="220.0" layoutX="14.0" layoutY="15.0" stroke="#455a64" strokeType="INSIDE" style="-fx-arc-height: 200px; -fx-arc-width: 50px;" width="374.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" height="220.0" layoutX="14.0" layoutY="15.0"  styleClass="border" width="374.0" />
       <TextField fx:id="idchatField" layoutX="46.0" layoutY="80.0" prefHeight="26.0" prefWidth="307.0" promptText="Kod czatu" />
       <PasswordField fx:id="passwordField" layoutX="46.0" layoutY="120.0" prefHeight="26.0" prefWidth="307.0" promptText="Hasło" />
-      <Label layoutX="122.0" layoutY="30.0" text="Dołącz do czatu" textFill="WHITE">
-         <font>
-            <Font name="Cambria" size="22.0" />
-         </font>
-      </Label>
-      <Button fx:id="addChatButton" layoutX="163.0" layoutY="160.0" mnemonicParsing="false" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10; -fx-background-radius: 10;" text="Dołącz" onAction="#handleAddChat" />
+      <Label layoutX="122.0" layoutY="30.0" text="Dołącz do czatu" textFill="WHITE" styleClass="label" />
+      <Button fx:id="addChatButton" layoutX="163.0" layoutY="160.0" mnemonicParsing="false" styleClass="button" text="Dołącz" onAction="#handleAddChat" />
    </children>
 </AnchorPane>

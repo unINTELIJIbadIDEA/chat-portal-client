@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+
+<AnchorPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="backgroundImage" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.RoomScreenController">
+    <stylesheets>
+        <URL value="@../../style/styleShip.css" />
+    </stylesheets>
+    <children>
+        <ImageView fx:id="backgroundImage" pickOnBounds="true" preserveRatio="false">
+            <image>
+                <Image url="@../../image/tło.png" />
+            </image>
+        </ImageView>
+
+        <BorderPane layoutX="0" layoutY="0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <top>
+                <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+                    <children>
+                        <Rectangle height="74.0" styleClass="headerBar" width="1490.0" StackPane.alignment="CENTER">
+                            <StackPane.margin>
+                                <Insets bottom="5.0" left="20.0" right="20.0" top="10.0" />
+                            </StackPane.margin>
+                        </Rectangle>
+                        <Label styleClass="headerLabel" text="Port-Ship" />
+                    </children>
+                </StackPane>
+            </top>
+
+            <center>
+                <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" opacity="0.6" prefHeight="910.0" prefWidth="1491.0" styleClass="gridBoard" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="5.0" />
+                    </BorderPane.margin>
+                    <children>
+                        <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" StackPane.alignment="CENTER">
+                            <children>
+                                <Label alignment="CENTER" prefHeight="18.0" prefWidth="1050.0" styleClass="headerLabel" text="Oczekiwanie na drugiego gracza" />
+                                <ImageView fitHeight="129.0" fitWidth="129.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../image/grey-9026_256.gif" />
+                                    </image>
+                                    <VBox.margin>
+                                        <Insets left="20.0" right="20.0" top="155.0" />
+                                    </VBox.margin>
+                                </ImageView>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

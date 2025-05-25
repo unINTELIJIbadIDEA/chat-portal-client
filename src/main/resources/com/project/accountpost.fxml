@@ -11,14 +11,26 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane id="accountpost" style="-fx-background-color: #ececec;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.AccountPostController">
+<?import java.net.URL?>
+<StackPane fx:id="accountpost"
+           id="accountpost"
+           xmlns="http://javafx.com/javafx/23.0.1"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.project.controllers.AccountPostController">
+   <stylesheets>
+      <URL value="@../../style/stylePost.css" />
+   </stylesheets>
    <children>
-      <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+      <BorderPane>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
+
          <top>
-            <Label fx:id="descriptionLabel" text="Twoje posty" BorderPane.alignment="CENTER">
+            <Label fx:id="descriptionLabel"
+                   id="descriptionLabel"
+                   text="Twoje posty"
+                   BorderPane.alignment="CENTER">
                <font>
                   <Font name="Cambria" size="24.0" />
                </font>
@@ -27,26 +39,41 @@
                </BorderPane.margin>
             </Label>
          </top>
+
          <center>
-            <VBox fx:id="postArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" BorderPane.alignment="CENTER">
+            <VBox fx:id="postArea"
+                  spacing="10.0"
+                  BorderPane.alignment="CENTER">
                <children>
-                  <HBox fx:id="addpostArea" spacing="10.0" style="-fx-border-color: #263238;" VBox.vgrow="NEVER">
+                  <HBox fx:id="addpostArea"
+                        styleClass="addpostArea"
+                        spacing="10.0"
+                        VBox.vgrow="NEVER">
                      <children>
-                        <TextArea fx:id="postTextArea" prefHeight="44.0" prefWidth="872.0" HBox.hgrow="ALWAYS" />
-                        <Button onAction="#addPostButtonClicked" fx:id="addPostButton" mnemonicParsing="false" prefHeight="44.0" prefWidth="198.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10; -fx-background-radius: 10;" text="Dodaj Post">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Button>
+                        <TextArea fx:id="postTextArea"
+                                  prefHeight="44.0"
+                                  prefWidth="872.0"
+                                  HBox.hgrow="ALWAYS" />
+
+                        <Button fx:id="addPostButton"
+                                text="Dodaj Post"
+                                onAction="#addPostButtonClicked"
+                                mnemonicParsing="false"
+                                prefHeight="44.0"
+                                prefWidth="198.0" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </HBox>
-                  <ScrollPane fx:id="viewpostArea" fitToWidth="true" maxHeight="Infinity" maxWidth="Infinity" VBox.vgrow="ALWAYS">
+
+                  <ScrollPane fx:id="viewpostArea"
+                              fitToWidth="true"
+                              VBox.vgrow="ALWAYS">
                      <VBox fx:id="postsView"/>
                   </ScrollPane>
                </children>
+
                <BorderPane.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </BorderPane.margin>

@@ -28,5 +28,6 @@ public class SessionManager {
     public boolean isAuthenticated() {
         return token != null;
     }
+
 }
 

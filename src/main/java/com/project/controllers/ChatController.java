@@ -7,11 +7,16 @@ import com.project.adapters.LocalDateTimeAdapter;
 import com.project.client.ClientSessionManager;
 import com.project.models.message.Message;
 import com.project.utils.Config;
+import com.project.utils.SessionManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,20 +30,23 @@ import java.util.stream.Collectors;
 
 public class ChatController {
     @FXML
-    private ListView<String> messageList;
+    private ListView<HBox> messageList;
+
     @FXML
     private TextField messageField;
+
     @FXML
     private Button sendButton;
 
     private ClientSessionManager clientSessionManager;
     private String bearerToken;
     private String chatId;
-    private static final String API_URL = "http://"+ Config.getHOST_SERVER() +":"+Config.getPORT_API()+"/api/messages";
+    private int userId;
+
+    private static final String API_URL = "http://" + Config.getHOST_SERVER() + ":" + Config.getPORT_API() + "/api/messages";
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
-
 
     public void setChatSession(String chatId, String bearerToken) {
         this.bearerToken = bearerToken;
@@ -48,6 +56,10 @@ public class ChatController {
 
         clientSessionManager = new ClientSessionManager(chatId, bearerToken, this::handleMessage);
         clientSessionManager.startSession();
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     private void loadMessages() {
@@ -69,7 +81,7 @@ public class ChatController {
 
                     Platform.runLater(() -> {
                         for (Message msg : messages) {
-                            messageList.getItems().add(msg.sender_id() + ": " + msg.content());
+                            messageList.getItems().add(createMessageBubble(msg));
                         }
                         messageList.scrollTo(messageList.getItems().size() - 1);
                     });
@@ -85,7 +97,7 @@ public class ChatController {
 
     private void handleMessage(Message message) {
         Platform.runLater(() -> {
-            messageList.getItems().add(message.sender_id() + ": " + message.content());
+            messageList.getItems().add(createMessageBubble(message));
             messageList.scrollTo(messageList.getItems().size() - 1);
         });
     }
@@ -101,5 +113,26 @@ public class ChatController {
                 System.out.println("Błąd wysyłania: " + e.getMessage());
             }
         }
+    }
+
+    private HBox createMessageBubble(Message msg) {
+        Label messageLabel = new Label(msg.content());
+        messageLabel.setWrapText(true);
+        messageLabel.setPadding(new Insets(10));
+        messageLabel.setMaxWidth(400);
+        messageLabel.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-border-radius: 10;");
+
+        HBox hBox = new HBox(messageLabel);
+        hBox.setPadding(new Insets(5, 10, 5, 10));
+
+        if (msg.sender_id() == userId) {
+            hBox.setAlignment(Pos.CENTER_RIGHT);
+            messageLabel.setStyle("-fx-background-color: #fff8e1; -fx-background-radius: 10; -fx-border-radius: 10;");
+        } else {
+            hBox.setAlignment(Pos.CENTER_LEFT);
+            messageLabel.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-border-radius: 10;");
+        }
+
+        return hBox;
     }
 }

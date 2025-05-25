@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
@@ -10,45 +9,41 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
-<?import javafx.scene.text.Font?>
 
-<AnchorPane id="loginscreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="415.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.LoginScreenController">
+<?import java.net.URL?>
+<AnchorPane id="loginscreen" fx:id="loginscreen" prefHeight="473.0" prefWidth="415.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.LoginScreenController">
+
+   <stylesheets>
+      <URL value="@../../style/styleStart.css" />
+   </stylesheets>
+
    <children>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#455a64" height="439.0" layoutX="17.0" layoutY="16.0" opacity="1" stroke="BLACK" strokeType="INSIDE" style="-fx-arc-width: 200px; -fx-arc-height: 50px;" width="380.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" height="439.0" layoutX="17.0" layoutY="16.0" styleClass="login-rectangle" width="380.0" />
+
       <ImageView fitHeight="71.0" fitWidth="91.0" layoutX="163.0" layoutY="371.0">
          <image>
             <Image url="@../../image/logo.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="174.0" fitWidth="209.0" layoutX="120.0" layoutY="41.0" pickOnBounds="true" preserveRatio="true" style="-fx-opacity: 50%;">
+
+      <ImageView fitHeight="174.0" fitWidth="209.0" layoutX="120.0" layoutY="41.0" pickOnBounds="true" preserveRatio="true" styleClass="login-image">
          <image>
             <Image url="@../../image/obraz_2025-03-15_190557919_preview_rev_1.png" />
          </image>
       </ImageView>
-      <VBox layoutX="35.0" layoutY="224.0" prefHeight="134.0" prefWidth="347.0" style="-fx-spacing: 7px;">
+
+      <VBox layoutX="33.0" layoutY="237.0" prefHeight="134.0" prefWidth="347.0" styleClass="login-form">
          <children>
-            <Label prefHeight="28.0" prefWidth="295.0" style=" -fx-text-fill: white;" text="Nazwa użytkownika" textFill="WHITE">
-               <font>
-                  <Font size="19.0" />
-               </font>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-            </Label>
-            <TextField fx:id="usernameField" promptText="Nazwa użytkownika" style="-fx-background-color: #fff8e1;">
-               <font>
-                  <Font size="11.0" />
-               </font>
-            </TextField>
-            <Label style="-fx-text-fill: white;" text="Hasło" textFill="WHITE">
-               <font>
-                  <Font size="19.0" />
-               </font>
-            </Label>
-            <PasswordField fx:id="passwordField" style="-fx-background-color: #fff8e1;" />
+            <Label styleClass="login-label" text="E-mail użytkownika" />
+            <TextField fx:id="usernameField" promptText="E-mail użytkownika" styleClass="text-field" />
+
+            <Label styleClass="login-label" text="Hasło" />
+            <PasswordField fx:id="passwordField" styleClass="password-field" />
          </children>
       </VBox>
-      <Button fx:id="backButton" layoutX="35.0" layoutY="391.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10px; -fx-background-radius: 10px;" text="Powrót" />
-      <Button fx:id="loginButton" layoutX="254.0" layoutY="391.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10px; -fx-background-radius: 10px;" text="Zaloguj" />
+
+      <Button fx:id="backButton" layoutX="35.0" layoutY="391.0" prefHeight="30.0" prefWidth="120.0" styleClass="login-button" text="Powrót" />
+
+      <Button fx:id="loginButton" layoutX="254.0" layoutY="391.0" prefHeight="30.0" prefWidth="120.0" styleClass="login-button" text="Zaloguj" />
    </children>
 </AnchorPane>

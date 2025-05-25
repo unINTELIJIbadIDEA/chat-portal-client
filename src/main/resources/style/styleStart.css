@@ -1,0 +1,97 @@
+/* === OGÓLNE === */
+
+.text-field, .password-field, .date-picker {
+    -fx-background-color: #fff8e1;
+    -fx-font-size: 13px;
+    -fx-font-family: "Cambria";
+}
+
+.button {
+    -fx-font-family: "Cambria";
+}
+
+/* === EFEKTY === */
+
+.button:hover {
+    -fx-background-color: #ffecb3;
+    -fx-cursor: hand;
+}
+
+.button:pressed {
+    -fx-background-color: #ffe082;
+}
+
+
+/* === LOGOWANIE / REJESTRACJA === */
+
+#loginscreen {
+    -fx-background-color: #263238;
+}
+
+.login-rectangle {
+    -fx-fill: #455a64;
+    -fx-stroke: black;
+    -fx-arc-width: 200px;
+    -fx-arc-height: 50px;
+}
+
+.login-image {
+    -fx-opacity: 0.5;
+}
+
+.login-form {
+    -fx-spacing: 7px;
+}
+
+.login-label {
+    -fx-text-fill: white;
+    -fx-font-size: 22px;
+    -fx-font-family: "Cambria";
+}
+
+.login-button {
+    -fx-background-color: #fff8e1;
+    -fx-border-color: grey;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-family: "Cambria";
+}
+
+
+/* === EKRAN STARTOWY === */
+
+#HomeScreen {
+    -fx-background-color: #263238;
+}
+
+.start-rectangle {
+    -fx-fill: #8398ac;
+    -fx-opacity: 0.27;
+    -fx-stroke: black;
+    -fx-arc-width: 200px;
+    -fx-arc-height: 50px;
+}
+
+.start-logo {
+    -fx-opacity: 1;
+}
+
+#TextScane {
+    -fx-fill: white;
+    -fx-font-size: 21px;
+    -fx-font-family: "Century Schoolbook";
+    -fx-text-alignment: center;
+}
+
+.start-button-box {
+    -fx-spacing: 10px;
+}
+
+.start-button {
+    -fx-background-color: #fff8e1;
+    -fx-border-color: grey;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px 20px;
+    -fx-font-family: "Cambria";
+}

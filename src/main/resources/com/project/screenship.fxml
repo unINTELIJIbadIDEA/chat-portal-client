@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+
+<StackPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="backgroundImage" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.ScreenShipController">
+   <stylesheets>
+      <URL value="@../../style/styleShip.css" />
+   </stylesheets>
+   <children>
+      <ImageView fx:id="backgroundImage" pickOnBounds="true" preserveRatio="false">
+         <image>
+            <Image url="@../../image/tło.png" />
+         </image>
+         <viewport>
+            <Rectangle2D />
+         </viewport>
+      </ImageView>
+
+      <BorderPane layoutX="0" layoutY="0">
+
+         <!-- GÓRNY PANEL -->
+         <top>
+            <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+               <children>
+                  <Rectangle height="74.0" styleClass="headerBar" width="1490.0" StackPane.alignment="CENTER">
+                     <StackPane.margin>
+                        <Insets bottom="5.0" left="20.0" right="20.0" top="10.0" />
+                     </StackPane.margin>
+                  </Rectangle>
+                  <Label styleClass="headerLabel" text="Port-Ship" />
+               </children>
+            </StackPane>
+         </top>
+
+         <!-- LEWA PLANSZA -->
+         <left>
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="910.0" prefWidth="740.0" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="20.0" left="20.0" right="5.0" top="5.0" />
+               </BorderPane.margin>
+               <children>
+                  <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                     <children>
+                        <Rectangle height="55.0" styleClass="boardContainer" width="730.0" StackPane.alignment="TOP_CENTER">
+                           <StackPane.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </StackPane.margin></Rectangle>
+                        <Label styleClass="boardTitle" text="Twoja Plansza" StackPane.alignment="TOP_CENTER">
+                           <StackPane.margin>
+                              <Insets top="7.0" />
+                           </StackPane.margin>
+                        </Label>
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="playerBoardPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="850.0" prefWidth="718.0" VBox.vgrow="ALWAYS">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin></StackPane>
+               </children>
+            </VBox>
+         </left>
+
+         <!-- PRAWA PLANSZA -->
+         <right>
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="20.0" left="5.0" right="20.0" top="5.0" />
+               </BorderPane.margin>
+               <children>
+                  <StackPane VBox.vgrow="ALWAYS">
+                     <children>
+                        <Rectangle height="54.0" styleClass="boardContainer" width="730.0" StackPane.alignment="TOP_CENTER">
+                           <StackPane.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </StackPane.margin></Rectangle>
+                        <Label styleClass="boardTitle" text="Plansza Przeciwnika" StackPane.alignment="TOP_CENTER">
+                           <StackPane.margin>
+                              <Insets top="7.0" />
+                           </StackPane.margin>
+                        </Label>
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="enemyBoardPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="850.0" prefWidth="718.0" VBox.vgrow="ALWAYS">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin></StackPane>
+               </children>
+            </VBox>
+         </right>
+      </BorderPane>
+   </children>
+</StackPane>
