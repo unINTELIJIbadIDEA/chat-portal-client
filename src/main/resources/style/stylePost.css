@@ -1,0 +1,87 @@
+.root{
+    -fx-background-color: #263238;
+}
+
+.hboxButton{
+    -fx-background-color: #fff8e1;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1px;
+    -fx-padding: 1px;
+}
+
+.buttonBox {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.button{
+    -fx-background-color: #fff8e1;
+    -fx-border-color: grey;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.backgroundStackPane{
+    -fx-background-color: #455a64;
+    -fx-background-radius: 7;
+}
+
+#screenLabel {
+    -fx-background-color: #37474F;
+    -fx-text-fill: white;
+    -fx-border-color: #90CAF9;
+    -fx-border-width: 3px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-font-size: 40px;
+    -fx-font-family: "Cambria";
+    -fx-alignment: center;
+}
+
+
+#accountpost {
+    -fx-background-color: #ececec;
+}
+
+#descriptionLabel {
+    -fx-font-size: 24px;
+    -fx-font-family: "Cambria";
+    -fx-text-fill: #263238;
+}
+
+.addpostArea {
+    -fx-border-color: #263238;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 5px;
+}
+
+#postTextArea {
+    -fx-font-size: 14px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+#addPostButton {
+    -fx-background-color: #fff8e1;
+    -fx-border-color: grey;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-font-size: 18px;
+    -fx-font-family: "Cambria";
+    -fx-text-fill: #263238;
+}
+
+#viewpostArea {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+}
+
+#forumpost {
+    -fx-background-color: #ececec;
+}

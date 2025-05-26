@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import java.net.URL?>
+<StackPane maxWidth="-Infinity" maxHeight="-Infinity" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.SectionShipController">
+    <stylesheets>
+        <URL value="@../../style/styleShip.css" />
+    </stylesheets>
+    <children>
+       <ScrollPane fitToWidth="true" prefHeight="600.0" prefWidth="300.0" styleClass="gridBoard">
+           <content>
+               <VBox prefHeight="602.0" prefWidth="300.0" spacing="10.0" styleClass="gridBoard">
+                   <padding>
+                       <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                   </padding>
+
+                   <!-- Statek 4-polowy -->
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="236"  strokeType="INSIDE"/>
+                   </HBox>
+
+                   <!-- Statki 3-polowe -->
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="177"  strokeType="INSIDE"/>
+                   </HBox>
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="177" strokeType="INSIDE"/>
+                   </HBox>
+
+                   <!-- Statki 2-polowe -->
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="118"  strokeType="INSIDE"/>
+                   </HBox>
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="118" strokeType="INSIDE"/>
+                   </HBox>
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="118"  strokeType="INSIDE"/>
+                   </HBox>
+
+                   <!-- Statki 1-polowe -->
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="59"  strokeType="INSIDE"/>
+                   </HBox>
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="59" strokeType="INSIDE"/>
+                   </HBox>
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="59" strokeType="INSIDE"/>
+                   </HBox>
+                   <HBox alignment="CENTER">
+                       <Rectangle styleClass="ship" height="53.0" width="59" strokeType="INSIDE"/>
+                   </HBox>
+
+               </VBox>
+           </content>
+       </ScrollPane>
+   </children>
+</StackPane>

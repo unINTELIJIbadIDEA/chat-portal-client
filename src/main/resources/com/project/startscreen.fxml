@@ -9,23 +9,52 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="HomeScreen" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0" prefWidth="415.0" style="-fx-background-color: #263238;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.StartScreenController">
+<?import java.net.URL?>
+<AnchorPane fx:id="HomeScreen"
+            id="HomeScreen"
+            prefHeight="470.0" prefWidth="415.0"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.project.controllers.StartScreenController">
+
+   <stylesheets>
+      <URL value="@../../style/styleStart.css" />
+   </stylesheets>
+
    <children>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#8398ac" height="405.0" layoutX="40.0" layoutY="35.0" opacity="0.27" stroke="BLACK" strokeType="INSIDE" style="-fx-arc-width: 200px; -fx-arc-height: 50px;" width="335.0" />
-      <ImageView fitHeight="190.0" fitWidth="230.0" layoutX="92.0" layoutY="35.0">
+      <Rectangle layoutX="40.0" layoutY="35.0"
+                 width="335.0" height="405.0"
+                 styleClass="start-rectangle" />
+
+      <ImageView layoutX="92.0" layoutY="35.0"
+                 fitHeight="190.0" fitWidth="230.0"
+                 styleClass="start-logo">
          <image>
             <Image url="@../../image/logo.png" />
          </image>
       </ImageView>
-      <Text id="TextScane" fill="WHITE" layoutX="85.0" layoutY="233.0" strokeType="OUTSIDE" strokeWidth="0.0" text="WITAJ NA TEXTPORTALU" textAlignment="CENTER" wrappingWidth="245.0">
-         <font>
-            <Font name="Century Schoolbook" size="21.0" />
-         </font>
-      </Text>
-      <VBox layoutX="108.0" layoutY="283.0" prefHeight="116.0" prefWidth="198.0" style="-fx-spacing: 10px;">
+
+      <Text fx:id="TextScane"
+            id="TextScane"
+            layoutX="85.0" layoutY="233.0"
+            text="WITAJ NA TEXTPORTALU"
+            wrappingWidth="245.0"
+            strokeType="OUTSIDE" strokeWidth="0.0" />
+
+      <VBox layoutX="108.0" layoutY="283.0"
+            prefHeight="116.0" prefWidth="198.0"
+            styleClass="start-button-box">
          <children>
-            <Button fx:id="ButtonLogin" maxWidth="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" style="-fx-border-color: grey; -fx-border-radius: 10px; -fx-background-color: #fff8e1; -fx-padding: 10px 20px; -fx-background-radius: 10px;" text="Zaloguj" />
-            <Button fx:id="ButtonSignUp" maxWidth="200.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10px; -fx-padding: 10px 20px; -fx-background-radius: 10px;" text="Zarejestruj" />
+            <Button fx:id="ButtonLogin"
+                    prefHeight="40.0" prefWidth="200.0"
+                    maxWidth="200.0"
+                    text="Zaloguj"
+                    styleClass="start-button"/>
+            <Button fx:id="ButtonSignUp"
+                    prefHeight="40.0" prefWidth="200.0"
+                    maxWidth="200.0"
+                    text="Zarejestruj"
+                    styleClass="start-button"/>
          </children>
       </VBox>
    </children>

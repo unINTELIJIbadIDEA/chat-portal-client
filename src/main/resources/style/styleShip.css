@@ -1,0 +1,60 @@
+/* === Tło całego okna === */
+#backgroundImage {
+    -fx-background-image: url("/image/tło.png");
+    -fx-background-size: cover;
+}
+
+/* === Pasek główny u góry === */
+.headerBar {
+    -fx-fill: #cfd8dc;
+    -fx-stroke: black;
+    -fx-arc-width: 10px;
+    -fx-arc-height: 10px;
+}
+
+.headerLabel {
+    -fx-font-size: 36px;
+    -fx-font-family: "Cambria Bold";
+}
+
+/* === Plansze (lewa/prawa) === */
+.boardContainer {
+    -fx-fill: #80cbc4;
+    -fx-stroke: black;
+    -fx-arc-width: 5px;
+    -fx-arc-height: 5px;
+}
+
+.boardTitle {
+    -fx-font-size: 30px;
+    -fx-font-family: Cambria;
+}
+
+/* === Plansza przeciwnika i gracza === */
+.gridBoard {
+    -fx-background-color: #cfd8dc;
+    -fx-border-color: #607d8b;
+}
+
+.buttonBattleBoard {
+    -fx-background-color: #e8eaf6;
+    -fx-border-color: #263238;
+    -fx-border-width: 0.2;
+    -fx-alignment: center;
+}
+
+/* === Labelki do oznaczenia wierszy/kolumn === */
+.gridLabel {
+    -fx-font-size: 20px;
+    -fx-font-family: Cambria;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+.ship{
+    -fx-fill: #5583ae;
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+    -fx-arc-height: 5;
+    -fx-arc-width: 5;
+}

@@ -1,0 +1,66 @@
+.root{
+    -fx-background-color: #263238;
+}
+
+.hboxButton{
+    -fx-background-color: #fff8e1;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1px;
+    -fx-padding: 1px;
+}
+
+.buttonBox {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.vboxChat{
+    -fx-background-color: #fff8e1;
+    -fx-background-radius: 5;
+    -fx-spacing: 10;
+}
+
+.chatArea{
+    -fx-background-color: #455a64;
+    -fx-background-radius: 7;
+}
+
+.button{
+    -fx-background-color: #fff8e1;
+    -fx-border-color: grey;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+}
+
+.border{
+    -fx-fill:#455a64;
+    -fx-stroke:#455a64;
+    -fx-stroke-type:INSIDE;
+    -fx-arc-height: 200px;
+    -fx-arc-width: 50px;
+}
+
+.label{
+    -fx-font-family: Cambria ;
+    -fx-font-size: 22;
+}
+
+#emptyChatLabel {
+    -fx-background-color: #37474F;
+    -fx-text-fill: white;
+    -fx-border-color: #90CAF9;
+    -fx-border-width: 3px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 20px;
+    -fx-font-size: 40px;
+    -fx-font-family: "Cambria";
+    -fx-alignment: center;
+}
+
+.chat {
+    -fx-background-color: #ececec;
+}
