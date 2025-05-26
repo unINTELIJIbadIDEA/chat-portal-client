@@ -64,3 +64,39 @@
 .chat {
     -fx-background-color: #ececec;
 }
+
+/* === Style dla gier === */
+.game-message {
+    -fx-background-color: #e3f2fd;
+    -fx-border-color: #1976d2;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
+    -fx-spacing: 5px;
+}
+
+.join-game-button {
+    -fx-background-color: #1976d2;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-font-weight: bold;
+}
+
+.join-game-button:hover {
+    -fx-background-color: #1565c0;
+    -fx-cursor: hand;
+}
+
+.create-game-button {
+    -fx-background-color: #4caf50;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+}
+
+.create-game-button:hover {
+    -fx-background-color: #45a049;
+    -fx-cursor: hand;
+}

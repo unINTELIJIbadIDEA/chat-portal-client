@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <?import java.net.URL?>
@@ -36,21 +37,32 @@
          </children>
       </VBox>
 
-      <TextField fx:id="messageField"
-                 AnchorPane.leftAnchor="20.0"
-                 AnchorPane.bottomAnchor="10.0"
-                 prefHeight="46.0"
-                 prefWidth="969.0" />
+      <!-- Panel dolny z polem tekstowym i przyciskami -->
+      <HBox spacing="10.0"
+            AnchorPane.leftAnchor="20.0"
+            AnchorPane.rightAnchor="20.0"
+            AnchorPane.bottomAnchor="10.0">
+         <children>
+            <TextField fx:id="messageField"
+                       HBox.hgrow="ALWAYS"
+                       prefHeight="46.0" />
 
-      <Button fx:id="sendButton"
-              onAction="#sendMessage"
-              mnemonicParsing="false"
-              text="Wyślij"
-              styleClass="button"
-              AnchorPane.rightAnchor="20.0"
-              AnchorPane.bottomAnchor="10.0"
-              prefHeight="46.0"
-              prefWidth="186.0"/>
+            <Button fx:id="createGameButton"
+                    mnemonicParsing="false"
+                    text="🚢 Gra"
+                    styleClass="button"
+                    prefHeight="46.0"
+                    prefWidth="100.0"/>
+
+            <Button fx:id="sendButton"
+                    onAction="#sendMessage"
+                    mnemonicParsing="false"
+                    text="Wyślij"
+                    styleClass="button"
+                    prefHeight="46.0"
+                    prefWidth="120.0"/>
+         </children>
+      </HBox>
 
    </children>
 </AnchorPane>

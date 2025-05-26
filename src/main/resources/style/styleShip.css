@@ -58,3 +58,63 @@
     -fx-arc-height: 5;
     -fx-arc-width: 5;
 }
+/* === Style dla drag & drop === */
+.drag-over {
+    -fx-background-color: #a5d6a7 !important;
+}
+
+.ship-placed {
+    -fx-background-color: #1976d2 !important;
+    -fx-border-color: #0d47a1 !important;
+    -fx-border-width: 2px !important;
+}
+
+.cell-hit {
+    -fx-background-color: #f44336 !important;
+    -fx-text-fill: white !important;
+}
+
+.cell-miss {
+    -fx-background-color: #2196f3 !important;
+    -fx-text-fill: white !important;
+}
+
+.draggable-ship {
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+}
+
+.draggable-ship:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 8, 0, 0, 3);
+}
+
+.ready-button {
+    -fx-background-color: #4caf50;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.ready-button:disabled {
+    -fx-background-color: #cccccc;
+    -fx-text-fill: #666666;
+}
+
+.status-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+    -fx-text-fill: white;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 20px;
+}
+
+.your-turn {
+    -fx-background-color: rgba(76, 175, 80, 0.9) !important;
+}
+
+.opponent-turn {
+    -fx-background-color: rgba(255, 152, 0, 0.9) !important;
+}
