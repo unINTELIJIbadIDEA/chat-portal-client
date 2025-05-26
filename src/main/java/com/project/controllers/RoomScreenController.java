@@ -2,6 +2,7 @@ package com.project.controllers;
 
 import com.project.client.BattleshipClient;
 import com.project.models.battleship.messages.JoinGameMessage;
+import com.project.utils.Config;
 import com.project.utils.SessionManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -38,7 +39,7 @@ public class RoomScreenController {
         });
 
         // Połącz z serwerem battleship w osobnym wątku
-        new Thread(() -> connectToBattleshipServer("localhost", battleshipPort)).start();
+        new Thread(() -> connectToBattleshipServer()).start();
 
         // DODAJ TU - obsługa zamykania okna
         Platform.runLater(() -> {
@@ -52,19 +53,22 @@ public class RoomScreenController {
         });
     }
 
-    private void connectToBattleshipServer(String host, int port) {
+    private void connectToBattleshipServer() {
         try {
-            battleshipClient = new BattleshipClient(host, port);
+            // ZMIEŃ - użyj Config zamiast hardcoded portu
+            String battleshipHost = Config.getHOST_SERVER();
+            int battleshipPort = Config.getBATTLESHIP_PORT();
+
+            battleshipClient = new BattleshipClient(battleshipHost, battleshipPort);
             battleshipClient.setGameStateListener(this::onGameStateChanged);
             battleshipClient.connect();
 
-            // DODAJ TU - shutdown hook
             battleshipClient.addShutdownHook();
 
             // Dołącz do gry
             battleshipClient.sendMessage(new JoinGameMessage(playerId, gameId, chatId));
 
-            System.out.println("Connected to battleship server: " + host + ":" + port);
+            System.out.println("Connected to battleship server: " + battleshipHost + ":" + battleshipPort);
 
         } catch (IOException e) {
             e.printStackTrace();
