@@ -1,6 +1,7 @@
 package com.project.client;
 
 import com.project.models.message.Message;
+import com.project.utils.Config;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -26,18 +27,34 @@ public class ClientSessionManager {
 
     public void startSession() {
         try {
+            String host = Config.getHOST_SERVER();
+            int port = Config.getPORT_SERVER();
+
+            System.out.println("=== CLIENT CONNECTION DEBUG ===");
+            System.out.println("Connecting to: " + host + ":" + port);
+            System.out.println("Chat ID: " + chatId);
+            System.out.println("Token length: " + (token != null ? token.length() : "null"));
+
             connection.connect();
             running = true;
             sender = new ClientMessageSender(connection, chatId);
             ClientMessageReceiver receiver = new ClientMessageReceiver(connection);
-            receiver.setMessageHandler(messageConsumer); // Dodano
+            receiver.setMessageHandler(messageConsumer);
             executor.execute(receiver);
 
             if (chatId != null) {
+                System.out.println("Sending join message...");
                 sender.sendMessage("/join " + chatId, token);
+                System.out.println("Join message sent successfully");
             }
+
+            System.out.println("Session started successfully");
         } catch (IOException e) {
-            System.out.println("Błąd połączenia: " + e.getMessage());
+            System.err.println("=== CONNECTION ERROR ===");
+            System.err.println("Host: " + Config.getHOST_SERVER());
+            System.err.println("Port: " + Config.getPORT_SERVER());
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
             endSession();
         }
     }

@@ -25,13 +25,34 @@ public class BattleshipClient {
     }
 
     public void connect() throws IOException {
-        socket = new Socket(host, port);
-        out = new ObjectOutputStream(socket.getOutputStream());
-        out.flush();
-        in = new ObjectInputStream(socket.getInputStream());
+        try {
+            System.out.println("[BATTLESHIP CLIENT]: Connecting to " + host + ":" + port);
+            socket = new Socket(host, port);
+            System.out.println("[BATTLESHIP CLIENT]: Socket connected");
 
-        running = true;
-        startReceiving();
+            // DODAJ opóźnienie i właściwą kolejność
+            System.out.println("[BATTLESHIP CLIENT]: Initializing output stream...");
+            out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush();
+            System.out.println("[BATTLESHIP CLIENT]: Output stream ready");
+
+            // Krótkie opóźnienie
+            Thread.sleep(200);
+
+            System.out.println("[BATTLESHIP CLIENT]: Initializing input stream...");
+            in = new ObjectInputStream(socket.getInputStream());
+            System.out.println("[BATTLESHIP CLIENT]: Input stream ready");
+
+            running = true;
+            startReceiving();
+
+            System.out.println("[BATTLESHIP CLIENT]: Successfully connected to battleship server");
+
+        } catch (Exception e) {
+            System.err.println("[BATTLESHIP CLIENT]: Connection failed: " + e.getMessage());
+            e.printStackTrace();
+            throw new IOException("Failed to connect to battleship server", e);
+        }
     }
 
     public void disconnect() {
@@ -44,19 +65,24 @@ public class BattleshipClient {
             if (in != null) in.close();
             if (socket != null) socket.close();
 
-            System.out.println("Disconnected from battleship server");
+            System.out.println("[BATTLESHIP CLIENT]: Disconnected from battleship server");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("[BATTLESHIP CLIENT]: Error during disconnect: " + e.getMessage());
         }
     }
 
     public void sendMessage(BattleshipMessage message) {
         try {
-            if (out != null) {
+            if (out != null && running) {
+                System.out.println("[BATTLESHIP CLIENT]: Sending message: " + message.getType());
                 out.writeObject(message);
                 out.flush();
+                System.out.println("[BATTLESHIP CLIENT]: Message sent successfully");
+            } else {
+                System.err.println("[BATTLESHIP CLIENT]: Cannot send message - not connected");
             }
         } catch (IOException e) {
+            System.err.println("[BATTLESHIP CLIENT]: Error sending message: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -65,15 +91,21 @@ public class BattleshipClient {
         receiverThread = new Thread(() -> {
             while (running && socket != null && socket.isConnected()) {
                 try {
+                    System.out.println("[BATTLESHIP CLIENT]: Waiting for message from server...");
                     BattleshipMessage message = (BattleshipMessage) in.readObject();
+                    System.out.println("[BATTLESHIP CLIENT]: Received message: " + message.getType());
                     handleMessage(message);
                 } catch (IOException | ClassNotFoundException e) {
                     if (running) {
-                        System.err.println("Error receiving battleship message: " + e.getMessage());
+                        System.err.println("[BATTLESHIP CLIENT]: Error receiving message: " + e.getMessage());
+                        if (e instanceof StreamCorruptedException) {
+                            System.err.println("[BATTLESHIP CLIENT]: Stream corrupted - this may be caused by proxy/tunnel");
+                        }
                     }
                     break;
                 }
             }
+            System.out.println("[BATTLESHIP CLIENT]: Receiver thread ended");
         });
         receiverThread.setDaemon(true);
         receiverThread.start();
@@ -100,11 +132,11 @@ public class BattleshipClient {
                 break;
 
             case ERROR:
-                System.err.println("Błąd serwera battleship: " + message);
+                System.err.println("[BATTLESHIP CLIENT]: Server error: " + message);
                 break;
 
             default:
-                System.out.println("Nieznany typ wiadomości battleship: " + message.getType());
+                System.out.println("[BATTLESHIP CLIENT]: Unknown message type: " + message.getType());
                 break;
         }
     }
@@ -122,12 +154,11 @@ public class BattleshipClient {
         this.shotResultListener = listener;
     }
 
-    public boolean isConnected() {
-        return socket != null && socket.isConnected() && !socket.isClosed();
-    }
-
     public void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::disconnect));
     }
 
+    public boolean isConnected() {
+        return socket != null && socket.isConnected() && !socket.isClosed() && running;
+    }
 }
