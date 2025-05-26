@@ -2,6 +2,8 @@ package com.project.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.project.adapters.LocalDateTimeAdapter;
 import com.project.client.ClientSessionManager;
@@ -24,7 +26,9 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +45,6 @@ public class ChatController {
     private ClientSessionManager clientSessionManager;
     private String bearerToken;
     private String chatId;
-    private int userId;
 
     private static final String API_URL = "http://" + Config.getHOST_SERVER() + ":" + Config.getPORT_API() + "/api/messages";
     private final Gson gson = new GsonBuilder()
@@ -58,9 +61,6 @@ public class ChatController {
         clientSessionManager.startSession();
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
 
     private void loadMessages() {
         new Thread(() -> {
@@ -116,23 +116,50 @@ public class ChatController {
     }
 
     private HBox createMessageBubble(Message msg) {
-        Label messageLabel = new Label(msg.content());
-        messageLabel.setWrapText(true);
-        messageLabel.setPadding(new Insets(10));
-        messageLabel.setMaxWidth(400);
-        messageLabel.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-border-radius: 10;");
+        Label messageLabel = createMessageLabel(msg.content());
+        int currentUserId = extractCurrentUserId();
+
+        boolean isCurrentUser = currentUserId != -1 && msg.sender_id() == currentUserId;
+        styleMessageLabel(messageLabel, isCurrentUser);
 
         HBox hBox = new HBox(messageLabel);
         hBox.setPadding(new Insets(5, 10, 5, 10));
-
-        if (msg.sender_id() == userId) {
-            hBox.setAlignment(Pos.CENTER_RIGHT);
-            messageLabel.setStyle("-fx-background-color: #fff8e1; -fx-background-radius: 10; -fx-border-radius: 10;");
-        } else {
-            hBox.setAlignment(Pos.CENTER_LEFT);
-            messageLabel.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-border-radius: 10;");
-        }
+        hBox.setAlignment(isCurrentUser ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
         return hBox;
     }
+
+    private Label createMessageLabel(String content) {
+        Label label = new Label(content);
+        label.setWrapText(true);
+        label.setPadding(new Insets(10));
+        label.setMaxWidth(400);
+        return label;
+    }
+
+    private int extractCurrentUserId() {
+        String token = SessionManager.getInstance().getToken();
+        if (token != null && !token.isEmpty()) {
+            try {
+                String[] tokenParts = token.split("\\.");
+                if (tokenParts.length >= 2) {
+                    String payload = new String(Base64.getUrlDecoder().decode(tokenParts[1]), StandardCharsets.UTF_8);
+                    JsonObject jsonPayload = JsonParser.parseString(payload).getAsJsonObject();
+                    return jsonPayload.get("userId").getAsInt();
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return -1;
+    }
+
+    private void styleMessageLabel(Label label, boolean isCurrentUser) {
+        if (isCurrentUser) {
+            label.setStyle("-fx-background-color: #fff8e1; -fx-background-radius: 10; -fx-border-radius: 10;");
+        } else {
+            label.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 10; -fx-border-radius: 10;");
+        }
+    }
+
 }

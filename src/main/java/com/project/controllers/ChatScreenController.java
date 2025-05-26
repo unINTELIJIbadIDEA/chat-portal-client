@@ -6,6 +6,7 @@ import com.project.ChatPortal;
 import com.project.utils.Config;
 import com.project.utils.SessionManager;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -29,6 +30,7 @@ import java.util.List;
 
 public class ChatScreenController {
 
+    public Button postsButton;
     @FXML
     private ListView<String> chatListView;
 
@@ -37,9 +39,6 @@ public class ChatScreenController {
 
     @FXML
     private Button addChatButton;
-
-    @FXML
-    private Button postsButton;
 
     public void initialize() {
         loadConversations();
@@ -152,5 +151,9 @@ public class ChatScreenController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void onPostsButtonClicked(ActionEvent actionEvent) {
+
     }
 }
