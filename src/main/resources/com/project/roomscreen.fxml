@@ -44,7 +44,11 @@
                     <children>
                         <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" StackPane.alignment="CENTER">
                             <children>
-                                <Label alignment="CENTER" prefHeight="18.0" prefWidth="1050.0" styleClass="headerLabel" text="Oczekiwanie na drugiego gracza" />
+                                <!-- Zmień tę linię w roomscreen.fxml: -->
+
+                                <!-- MA BYĆ: -->
+                                <Label fx:id="waitingLabel" alignment="CENTER" prefHeight="18.0" prefWidth="1050.0" styleClass="headerLabel" text="Oczekiwanie na drugiego gracza" />
+
                                 <ImageView fitHeight="129.0" fitWidth="129.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
                                         <Image url="@../../image/grey-9026_256.gif" />

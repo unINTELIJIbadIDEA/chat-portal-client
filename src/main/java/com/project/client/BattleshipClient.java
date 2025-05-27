@@ -112,26 +112,35 @@ public class BattleshipClient {
     }
 
     private void handleMessage(BattleshipMessage message) {
+        System.out.println("[BATTLESHIP CLIENT]: ===== HANDLING MESSAGE =====");
+        System.out.println("[BATTLESHIP CLIENT]: Message type: " + message.getType());
+
         switch (message.getType()) {
             case GAME_UPDATE:
                 GameUpdateMessage gameUpdate = (GameUpdateMessage) message;
+                System.out.println("[BATTLESHIP CLIENT]: Game state: " + gameUpdate.getGame().getState());
+                System.out.println("[BATTLESHIP CLIENT]: Players: " + gameUpdate.getGame().getPlayerBoards().keySet());
+                System.out.println("[BATTLESHIP CLIENT]: Players ready: " + gameUpdate.getGame().getPlayersReady());
+
                 if (gameUpdateListener != null) {
+                    System.out.println("[BATTLESHIP CLIENT]: Calling gameUpdateListener...");
                     gameUpdateListener.accept(gameUpdate);
-                }
-                // Powiadom o zmianie stanu gry
-                if (gameStateListener != null) {
-                    gameStateListener.accept(gameUpdate.getGame().getState().toString());
+                } else {
+                    System.err.println("[BATTLESHIP CLIENT]: gameUpdateListener is NULL!");
                 }
 
-                // DODAJ TO - logowanie dla debugowania
-                System.out.println("[BATTLESHIP CLIENT]: Game state updated to: " +
-                        gameUpdate.getGame().getState());
-                System.out.println("[BATTLESHIP CLIENT]: Players in game: " +
-                        gameUpdate.getGame().getPlayerBoards().keySet());
+                // Powiadom o zmianie stanu gry
+                if (gameStateListener != null) {
+                    System.out.println("[BATTLESHIP CLIENT]: Calling gameStateListener with state: " + gameUpdate.getGame().getState());
+                    gameStateListener.accept(gameUpdate.getGame().getState().toString());
+                } else {
+                    System.err.println("[BATTLESHIP CLIENT]: gameStateListener is NULL!");
+                }
                 break;
 
             case SHOT_RESULT:
                 ShotResultMessage shotResult = (ShotResultMessage) message;
+                System.out.println("[BATTLESHIP CLIENT]: Shot result: " + shotResult.getResult());
                 if (shotResultListener != null) {
                     shotResultListener.accept(shotResult);
                 }
