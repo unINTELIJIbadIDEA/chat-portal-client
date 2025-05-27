@@ -1,6 +1,7 @@
 package com.project.controllers;
 
 import com.project.client.BattleshipClient;
+import com.project.models.battleship.messages.GameUpdateMessage;
 import com.project.models.battleship.messages.JoinGameMessage;
 import com.project.utils.Config;
 import com.project.utils.SessionManager;
@@ -55,14 +56,16 @@ public class RoomScreenController {
 
     private void connectToBattleshipServer() {
         try {
-            // ZMIEŃ - użyj Config zamiast hardcoded portu
             String battleshipHost = Config.getHOST_SERVER();
             int battleshipPort = Config.getBATTLESHIP_PORT();
 
             battleshipClient = new BattleshipClient(battleshipHost, battleshipPort);
-            battleshipClient.setGameStateListener(this::onGameStateChanged);
-            battleshipClient.connect();
 
+            // USTAW LISTENERY PRZED POŁĄCZENIEM
+            battleshipClient.setGameStateListener(this::onGameStateChanged);
+            battleshipClient.setGameUpdateListener(this::onGameUpdate); // DODAJ TO
+
+            battleshipClient.connect();
             battleshipClient.addShutdownHook();
 
             // Dołącz do gry
@@ -164,4 +167,45 @@ public class RoomScreenController {
         }
         return -1;
     }
+
+    private void onGameUpdate(GameUpdateMessage gameUpdate) {
+        Platform.runLater(() -> {
+            System.out.println("[ROOM CONTROLLER]: Received game update - State: " +
+                    gameUpdate.getGame().getState());
+            System.out.println("[ROOM CONTROLLER]: Players: " +
+                    gameUpdate.getGame().getPlayerBoards().keySet());
+
+            // Aktualizuj UI na podstawie stanu gry
+            switch (gameUpdate.getGame().getState()) {
+                case WAITING_FOR_PLAYERS:
+                    if (waitingLabel != null) {
+                        waitingLabel.setText("Oczekiwanie na drugiego gracza...");
+                    }
+                    break;
+                case SHIP_PLACEMENT:
+                    if (waitingLabel != null) {
+                        waitingLabel.setText("Drugi gracz dołączył! Przygotowanie do gry...");
+                    }
+                    // Automatycznie przejdź do ustawiania statków po krótkim czasie
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(2000);
+                            Platform.runLater(this::openShipPlacementWindow);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                    break;
+                case PLAYING:
+                    openGameWindow();
+                    break;
+                case FINISHED:
+                    if (waitingLabel != null) {
+                        waitingLabel.setText("Gra zakończona!");
+                    }
+                    break;
+            }
+        });
+    }
+
 }

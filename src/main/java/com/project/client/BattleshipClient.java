@@ -122,6 +122,12 @@ public class BattleshipClient {
                 if (gameStateListener != null) {
                     gameStateListener.accept(gameUpdate.getGame().getState().toString());
                 }
+
+                // DODAJ TO - logowanie dla debugowania
+                System.out.println("[BATTLESHIP CLIENT]: Game state updated to: " +
+                        gameUpdate.getGame().getState());
+                System.out.println("[BATTLESHIP CLIENT]: Players in game: " +
+                        gameUpdate.getGame().getPlayerBoards().keySet());
                 break;
 
             case SHOT_RESULT:
