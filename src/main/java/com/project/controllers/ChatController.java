@@ -59,6 +59,7 @@ public class ChatController {
     private String bearerToken;
     private String chatId;
     private HttpClient httpClient = HttpClient.newHttpClient();
+    private volatile boolean battleshipWindowOpened = false;
 
     private static final String API_URL = "http://" + Config.getHOST_SERVER() + ":" + Config.getPORT_API() + "/api/messages";
     private static final String BATTLESHIP_API_URL = "http://" + Config.getHOST_SERVER() + ":" + Config.getPORT_API() + "/api/battleship";
@@ -285,6 +286,14 @@ public class ChatController {
 
     // NOWA METODA - otwieranie okna gry
     private void openBattleshipWindow(JsonObject gameData) {
+        if (battleshipWindowOpened) {
+            System.out.println("[CHAT CONTROLLER]: Battleship window already opened, ignoring request");
+            return;
+        }
+
+        battleshipWindowOpened = true;
+        System.out.println("[CHAT CONTROLLER]: Opening battleship window...");
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/project/roomscreen.fxml"));
             Parent root = loader.load();
@@ -300,13 +309,24 @@ public class ChatController {
                 );
             }
 
+            // Otwórz w nowym oknie, nie zastępuj okna czatu
             Stage battleshipStage = new Stage();
             battleshipStage.setTitle("Gra w statki - Poczekalnia");
             battleshipStage.setScene(new Scene(root, 1200, 800));
+
+            // KRYTYCZNE: Reset flagi po zamknięciu okna
+            battleshipStage.setOnCloseRequest(event -> {
+                battleshipWindowOpened = false;
+                System.out.println("[CHAT CONTROLLER]: Battleship window closed, flag reset");
+            });
+
             battleshipStage.show();
+            System.out.println("[CHAT CONTROLLER]: Battleship window opened successfully");
 
         } catch (IOException e) {
             e.printStackTrace();
+            battleshipWindowOpened = false; // Reset flagi w przypadku błędu
+            System.err.println("[CHAT CONTROLLER]: Error opening battleship window: " + e.getMessage());
         }
     }
 

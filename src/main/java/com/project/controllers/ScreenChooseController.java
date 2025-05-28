@@ -40,6 +40,7 @@ public class ScreenChooseController {
     private int playerId;
     private Button readyButton;
     private boolean isReady = false;
+    private volatile boolean gameWindowOpened = false;
 
     // Mapa statków do umieszczenia
     private Map<ShipType, Rectangle> availableShips = new HashMap<>();
@@ -372,6 +373,8 @@ public class ScreenChooseController {
         }
     }
 
+
+
     private void createReadyButton() {
         readyButton = new Button("Gotowy!");
         readyButton.getStyleClass().add("ready-button");
@@ -384,12 +387,15 @@ public class ScreenChooseController {
                 readyButton.setText("Oczekiwanie na przeciwnika...");
                 readyButton.setDisable(true);
 
-                System.out.println("[SHIP PLACEMENT]: Player ready! All ships placed.");
+                System.out.println("[SHIP PLACEMENT]: Player " + playerId + " is ready! All ships placed.");
 
-                // DODAJ: Ustaw listener dla zmian stanu gry
+                // KRYTYCZNE: Ustaw listenery dla zmian stanu gry
                 if (battleshipClient != null) {
                     battleshipClient.setGameStateListener(this::handleGameStateChange);
                     battleshipClient.setGameUpdateListener(this::handleGameUpdate);
+                    System.out.println("[SHIP PLACEMENT]: Game listeners set for player " + playerId);
+                } else {
+                    System.err.println("[SHIP PLACEMENT]: BattleshipClient is null!");
                 }
             }
         });
@@ -428,32 +434,52 @@ public class ScreenChooseController {
     }
 
     private void handleGameStateChange(String newState) {
-        System.out.println("[SHIP PLACEMENT]: Game state changed to: " + newState);
+        System.out.println("[SHIP PLACEMENT]: Game state changed to: " + newState + " for player: " + playerId);
 
         Platform.runLater(() -> {
             if ("PLAYING".equals(newState)) {
-                System.out.println("[SHIP PLACEMENT]: Game is starting! Opening game window...");
-                openGameWindow();
+                System.out.println("[SHIP PLACEMENT]: Game is starting! Opening game window for player: " + playerId);
+                if (!gameWindowOpened) {
+                    gameWindowOpened = true;
+                    openGameWindow();
+                }
             }
         });
     }
 
     private void handleGameUpdate(com.project.models.battleship.messages.GameUpdateMessage gameUpdate) {
-        System.out.println("[SHIP PLACEMENT]: Game update received. State: " + gameUpdate.getGame().getState());
+        System.out.println("[SHIP PLACEMENT]: Game update received. State: " + gameUpdate.getGame().getState() + " for player: " + playerId);
+        System.out.println("[SHIP PLACEMENT]: Players ready: " + gameUpdate.getGame().getPlayersReady());
 
         Platform.runLater(() -> {
             if (gameUpdate.getGame().getState() == com.project.models.battleship.GameState.PLAYING) {
-                System.out.println("[SHIP PLACEMENT]: Both players ready! Opening game window...");
-                openGameWindow();
+                System.out.println("[SHIP PLACEMENT]: Both players ready! Opening game window for player: " + playerId);
+                if (!gameWindowOpened) {
+                    gameWindowOpened = true;
+                    openGameWindow();
+                }
+            } else {
+                // Aktualizuj status na przycisku
+                if (readyButton != null && isReady) {
+                    long readyCount = gameUpdate.getGame().getPlayersReady().values().stream()
+                            .mapToLong(ready -> ready ? 1 : 0)
+                            .sum();
+                    readyButton.setText("Gotowych graczy: " + readyCount + "/2");
+                }
             }
         });
     }
 
     private void openGameWindow() {
         try {
-            System.out.println("[SHIP PLACEMENT]: Opening game window...");
+            System.out.println("[SHIP PLACEMENT]: Opening game window for player: " + playerId);
 
-            Stage currentStage = (Stage) readyButton.getScene().getWindow();
+            if (root == null || root.getScene() == null) {
+                System.err.println("[SHIP PLACEMENT]: Cannot get current stage");
+                return;
+            }
+
+            Stage currentStage = (Stage) root.getScene().getWindow();
 
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/com/project/screenship.fxml"));
             javafx.scene.Scene scene = new javafx.scene.Scene(loader.load());
@@ -461,16 +487,19 @@ public class ScreenChooseController {
             com.project.controllers.ScreenShipController controller = loader.getController();
             if (controller != null) {
                 controller.initializeGame(gameId, playerId, battleshipClient);
+                System.out.println("[SHIP PLACEMENT]: Game controller initialized for player: " + playerId);
+            } else {
+                System.err.println("[SHIP PLACEMENT]: Game controller is null!");
             }
 
             currentStage.setScene(scene);
-            currentStage.setTitle("Gra w statki - Rozgrywka");
+            currentStage.setTitle("Gra w statki - Rozgrywka (Gracz " + playerId + ")");
 
-            System.out.println("[SHIP PLACEMENT]: Game window opened successfully");
+            System.out.println("[SHIP PLACEMENT]: Game window opened successfully for player: " + playerId);
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("[SHIP PLACEMENT]: Error opening game window: " + e.getMessage());
+            System.err.println("[SHIP PLACEMENT]: Error opening game window for player " + playerId + ": " + e.getMessage());
         }
     }
 
