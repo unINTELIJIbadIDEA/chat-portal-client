@@ -83,16 +83,64 @@ public class RoomScreenController {
                 }
             });
 
+            // KRYTYCZNE: Dodaj opóźnienie przed wysłaniem JOIN_GAME
+            Thread.sleep(1000);
+
             // Dołącz do gry
-            battleshipClient.sendMessage(new JoinGameMessage(playerId, gameId, chatId));
+            JoinGameMessage joinMessage = new JoinGameMessage(playerId, gameId, chatId);
+            battleshipClient.sendMessage(joinMessage);
 
             System.out.println("[ROOM CONTROLLER]: Connected to battleship server successfully");
 
-        } catch (IOException e) {
+            // DODAJ: Sprawdzanie połączenia co 5 sekund
+            startConnectionMonitor();
+
+        } catch (Exception e) {
             e.printStackTrace();
             Platform.runLater(() -> {
                 if (waitingLabel != null) {
                     waitingLabel.setText("Błąd połączenia z serwerem gry: " + e.getMessage());
+                }
+            });
+        }
+    }
+
+    private void startConnectionMonitor() {
+        Thread monitorThread = new Thread(() -> {
+            while (battleshipClient != null && battleshipClient.isConnected()) {
+                try {
+                    Thread.sleep(5000); // Sprawdzaj co 5 sekund
+                    if (!battleshipClient.isConnected()) {
+                        System.err.println("[ROOM CONTROLLER]: Connection lost! Attempting to reconnect...");
+                        Platform.runLater(() -> {
+                            if (waitingLabel != null) {
+                                waitingLabel.setText("Połączenie utracone. Próba ponownego połączenia...");
+                            }
+                        });
+                        reconnectToBattleshipServer();
+                        break;
+                    }
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        });
+        monitorThread.setDaemon(true);
+        monitorThread.start();
+    }
+
+    private void reconnectToBattleshipServer() {
+        try {
+            if (battleshipClient != null) {
+                battleshipClient.disconnect();
+            }
+            Thread.sleep(2000); // Poczekaj 2 sekundy
+            connectToBattleshipServer();
+        } catch (Exception e) {
+            System.err.println("[ROOM CONTROLLER]: Reconnection failed: " + e.getMessage());
+            Platform.runLater(() -> {
+                if (waitingLabel != null) {
+                    waitingLabel.setText("Nie można ponownie połączyć z serwerem gry");
                 }
             });
         }
