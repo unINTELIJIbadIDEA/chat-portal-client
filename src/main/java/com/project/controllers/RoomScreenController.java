@@ -62,98 +62,48 @@ public class RoomScreenController {
     }
 
     private void connectToBattleshipServer() {
-        Platform.runLater(() -> {
-            if (waitingLabel != null) {
-                waitingLabel.setText("Łączenie z serwerem gry...");
-            }
-        });
+        try {
+            String battleshipHost = Config.getHOST_SERVER();
+            int battleshipPort = Config.getBATTLESHIP_PORT();
 
-        new Thread(() -> {
-            int maxRetries = 5;
-            int retryCount = 0;
+            System.out.println("[ROOM CONTROLLER]: Connecting to battleship server: " + battleshipHost + ":" + battleshipPort);
 
-            while (retryCount < maxRetries && !Thread.currentThread().isInterrupted()) {
-                try {
-                    retryCount++;
-                    System.out.println("[ROOM CONTROLLER]: Connection attempt " + retryCount + "/" + maxRetries);
+            battleshipClient = new BattleshipClient(battleshipHost, battleshipPort);
 
-                    int finalRetryCount = retryCount;
-                    Platform.runLater(() -> {
-                        if (waitingLabel != null) {
-                            waitingLabel.setText("Próba połączenia " + finalRetryCount + "/" + maxRetries + "...");
-                        }
-                    });
+            // KRYTYCZNE: Ustaw listenery PRZED połączeniem
+            battleshipClient.setGameStateListener(this::onGameStateChanged);
+            battleshipClient.setGameUpdateListener(this::onGameUpdate);
+            System.out.println("[ROOM CONTROLLER]: Listeners set before connection");
 
-                    String battleshipHost = Config.getHOST_SERVER();
-                    int battleshipPort = Config.getBATTLESHIP_PORT();
+            battleshipClient.connect();
+            battleshipClient.addShutdownHook();
 
-                    System.out.println("[ROOM CONTROLLER]: Connecting to battleship server: " + battleshipHost + ":" + battleshipPort);
-
-                    if (battleshipClient != null) {
-                        battleshipClient.disconnect();
-                    }
-
-                    battleshipClient = new BattleshipClient(battleshipHost, battleshipPort);
-
-                    // USTAW LISTENERY PRZED POŁĄCZENIEM
-                    battleshipClient.setGameStateListener(this::onGameStateChanged);
-                    battleshipClient.setGameUpdateListener(this::onGameUpdate);
-
-                    battleshipClient.connect();
-                    battleshipClient.addShutdownHook();
-
-                    Platform.runLater(() -> {
-                        if (waitingLabel != null) {
-                            waitingLabel.setText("Dołączanie do gry...");
-                        }
-                    });
-
-                    // Poczekaj na ustabilizowanie połączenia
-                    Thread.sleep(2000);
-
-                    // Dołącz do gry
-                    System.out.println("[ROOM CONTROLLER]: Sending JOIN_GAME message");
-                    battleshipClient.sendMessage(new JoinGameMessage(playerId, gameId, chatId));
-
-                    // Poczekaj na potwierdzenie
-                    Thread.sleep(3000);
-
-                    // Sprawdź czy połączenie jest aktywne
-                    if (battleshipClient.isConnected()) {
-                        System.out.println("[ROOM CONTROLLER]: Connected to battleship server successfully");
-                        Platform.runLater(() -> {
-                            if (waitingLabel != null) {
-                                waitingLabel.setText("Oczekiwanie na drugiego gracza...");
-                            }
-                        });
-
-                        // Uruchom monitoring połączenia
-                        startConnectionMonitoring();
-                        return; // Sukces!
-                    } else {
-                        throw new IOException("Connection not established");
-                    }
-
-                } catch (Exception e) {
-                    System.err.println("[ROOM CONTROLLER]: Connection attempt " + retryCount + " failed: " + e.getMessage());
-
-                    if (retryCount < maxRetries) {
-                        try {
-                            Thread.sleep(3000 * retryCount); // Zwiększaj opóźnienie
-                        } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt();
-                            break;
-                        }
-                    } else {
-                        Platform.runLater(() -> {
-                            if (waitingLabel != null) {
-                                waitingLabel.setText("Nie można połączyć z serwerem gry. Spróbuj ponownie.");
-                            }
-                        });
-                    }
+            Platform.runLater(() -> {
+                if (waitingLabel != null) {
+                    waitingLabel.setText("Dołączanie do gry...");
                 }
-            }
-        }).start();
+            });
+
+            // Opóźnienie przed wysłaniem JOIN_GAME
+            Thread.sleep(1000);
+
+            // Dołącz do gry
+            JoinGameMessage joinMessage = new JoinGameMessage(playerId, gameId, chatId);
+            battleshipClient.sendMessage(joinMessage);
+
+            System.out.println("[ROOM CONTROLLER]: Connected to battleship server successfully");
+
+            // Uruchom monitor połączenia
+            startConnectionMonitor();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() -> {
+                if (waitingLabel != null) {
+                    waitingLabel.setText("Błąd połączenia z serwerem gry: " + e.getMessage());
+                }
+            });
+        }
     }
 
     private void startConnectionMonitoring() {
@@ -270,25 +220,35 @@ public class RoomScreenController {
         System.out.println("[ROOM CONTROLLER]: ===== GAME UPDATE RECEIVED =====");
         System.out.println("[ROOM CONTROLLER]: Game state: " + gameUpdate.getGame().getState() + " for player: " + playerId);
         System.out.println("[ROOM CONTROLLER]: Players: " + gameUpdate.getGame().getPlayerBoards().keySet());
-        System.out.println("[ROOM CONTROLLER]: Players ready: " + gameUpdate.getGame().getPlayersReady());
+        System.out.println("[ROOM CONTROLLER]: Current player ID: " + playerId);
+        System.out.println("[ROOM CONTROLLER]: Ship placement opened flag: " + shipPlacementOpened);
 
         Platform.runLater(() -> {
             if (waitingLabel != null) {
-                switch (gameUpdate.getGame().getState()) {
+                GameState state = gameUpdate.getGame().getState();
+
+                switch (state) {
                     case WAITING_FOR_PLAYERS:
                         waitingLabel.setText("Oczekiwanie na drugiego gracza...");
+                        // Reset flags
                         shipPlacementOpened = false;
                         gameWindowOpened = false;
                         break;
 
                     case SHIP_PLACEMENT:
-                        System.out.println("[ROOM CONTROLLER]: ===== GAME UPDATE - SHIP PLACEMENT =====");
-                        System.out.println("[ROOM CONTROLLER]: Player " + playerId + " received SHIP_PLACEMENT via GameUpdate");
-                        handleShipPlacementState();
+                        // KRYTYCZNE: Sprawdź czy okno nie zostało już otwarte
+                        if (!shipPlacementOpened) {
+                            System.out.println("[ROOM CONTROLLER]: Transitioning to SHIP_PLACEMENT state");
+                            handleShipPlacementState();
+                        } else {
+                            System.out.println("[ROOM CONTROLLER]: Ship placement already handled, skipping");
+                        }
                         break;
 
                     case PLAYING:
-                        handlePlayingState();
+                        if (!gameWindowOpened) {
+                            handlePlayingState();
+                        }
                         break;
 
                     case FINISHED:
@@ -306,22 +266,21 @@ public class RoomScreenController {
             waitingLabel.setText("Drugi gracz dołączył! Przygotowanie do gry...");
         }
 
-        // KRYTYCZNE: Sprawdź czy okno już nie zostało otwarte
+        // KRYTYCZNE: Ustaw flagę PRZED otwarciem okna
         if (!shipPlacementOpened) {
             shipPlacementOpened = true;
             System.out.println("[ROOM CONTROLLER]: Opening ship placement window for player: " + playerId);
 
-            // Krótkie opóźnienie przed przejściem
-            new Thread(() -> {
+            // Użyj Platform.runLater dla bezpiecznego otwarcia okna
+            Platform.runLater(() -> {
                 try {
-                    Thread.sleep(1000);
-                    Platform.runLater(this::openShipPlacementWindow);
-                } catch (InterruptedException e) {
+                    Thread.sleep(500); // Krótkie opóźnienie dla płynności
+                    openShipPlacementWindow();
+                } catch (Exception e) {
                     e.printStackTrace();
+                    shipPlacementOpened = false; // Reset flagi w przypadku błędu
                 }
-            }).start();
-        } else {
-            System.out.println("[ROOM CONTROLLER]: Ship placement window already opened, skipping...");
+            });
         }
     }
 

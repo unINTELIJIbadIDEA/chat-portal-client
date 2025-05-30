@@ -247,6 +247,8 @@ public class BattleshipClient {
     private void handleMessage(BattleshipMessage message) {
         System.out.println("[BATTLESHIP CLIENT]: ===== HANDLING MESSAGE =====");
         System.out.println("[BATTLESHIP CLIENT]: Message type: " + message.getType());
+        System.out.println("[BATTLESHIP CLIENT]: Running: " + running);
+        System.out.println("[BATTLESHIP CLIENT]: Connected: " + isConnected());
 
         switch (message.getType()) {
             case GAME_UPDATE:
@@ -255,14 +257,36 @@ public class BattleshipClient {
                 System.out.println("[BATTLESHIP CLIENT]: Players: " + gameUpdate.getGame().getPlayerBoards().keySet());
                 System.out.println("[BATTLESHIP CLIENT]: Players ready: " + gameUpdate.getGame().getPlayersReady());
 
-                if (gameUpdateListener != null) {
-                    System.out.println("[BATTLESHIP CLIENT]: Calling gameUpdateListener...");
-                    gameUpdateListener.accept(gameUpdate);
+                // KRYTYCZNE: Najpierw powiadom o zmianie stanu
+                if (gameStateListener != null) {
+                    String newState = gameUpdate.getGame().getState().toString();
+                    System.out.println("[BATTLESHIP CLIENT]: Notifying state change to: " + newState);
+
+                    // Wywołaj listener w osobnym wątku, aby nie blokować odbierania
+                    new Thread(() -> {
+                        try {
+                            gameStateListener.accept(newState);
+                        } catch (Exception e) {
+                            System.err.println("[BATTLESHIP CLIENT]: Error in gameStateListener: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }).start();
                 }
 
-                if (gameStateListener != null) {
-                    System.out.println("[BATTLESHIP CLIENT]: Calling gameStateListener with state: " + gameUpdate.getGame().getState());
-                    gameStateListener.accept(gameUpdate.getGame().getState().toString());
+                // Potem wywołaj gameUpdateListener
+                if (gameUpdateListener != null) {
+                    System.out.println("[BATTLESHIP CLIENT]: Calling gameUpdateListener...");
+
+                    new Thread(() -> {
+                        try {
+                            gameUpdateListener.accept(gameUpdate);
+                        } catch (Exception e) {
+                            System.err.println("[BATTLESHIP CLIENT]: Error in gameUpdateListener: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }).start();
+                } else {
+                    System.err.println("[BATTLESHIP CLIENT]: gameUpdateListener is NULL!");
                 }
                 break;
 
@@ -270,7 +294,13 @@ public class BattleshipClient {
                 ShotResultMessage shotResult = (ShotResultMessage) message;
                 System.out.println("[BATTLESHIP CLIENT]: Shot result: " + shotResult.getResult());
                 if (shotResultListener != null) {
-                    shotResultListener.accept(shotResult);
+                    new Thread(() -> {
+                        try {
+                            shotResultListener.accept(shotResult);
+                        } catch (Exception e) {
+                            System.err.println("[BATTLESHIP CLIENT]: Error in shotResultListener: " + e.getMessage());
+                        }
+                    }).start();
                 }
                 break;
 
@@ -281,6 +311,15 @@ public class BattleshipClient {
             default:
                 System.out.println("[BATTLESHIP CLIENT]: Unknown message type: " + message.getType());
                 break;
+        }
+
+        System.out.println("[BATTLESHIP CLIENT]: ===== MESSAGE HANDLING COMPLETE =====");
+    }
+
+    public void requestGameUpdate() {
+        if (lastJoinMessage != null && isConnected()) {
+            System.out.println("[BATTLESHIP CLIENT]: Requesting game update...");
+            sendMessage(lastJoinMessage);
         }
     }
 
