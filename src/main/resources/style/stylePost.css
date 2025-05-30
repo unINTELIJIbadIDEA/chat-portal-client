@@ -15,6 +15,21 @@
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-border-width: 0;
+    -fx-padding: 5;
+    -fx-cursor: hand;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian, transparent, 0, 0, 0, 0);
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+.buttonBox:hover {
+    -fx-background-color: #ffe0b2;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.2, 0, 2);
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
 }
 
 .button{
@@ -23,6 +38,7 @@
     -fx-background-radius: 10;
     -fx-border-radius: 10;
 }
+
 
 .backgroundStackPane{
     -fx-background-color: #455a64;

@@ -4,12 +4,15 @@ import com.google.gson.Gson;
 import com.project.models.Post;
 import com.project.utils.Config;
 import com.project.utils.SessionManager;
+import javafx.animation.ScaleTransition;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URI;
@@ -73,11 +76,15 @@ public class ForumPostController implements Initializable {
                 HBox.setHgrow(postBox, Priority.ALWAYS);
 
                 postsView.getChildren().add(wrapper);
+
+
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
+
+
 
 
 }
