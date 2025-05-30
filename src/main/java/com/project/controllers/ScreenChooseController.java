@@ -3,6 +3,7 @@ package com.project.controllers;
 import com.project.client.BattleshipClient;
 import com.project.models.battleship.ShipType;
 import com.project.models.battleship.messages.PlaceShipMessage;
+import com.project.models.battleship.messages.PlayerReadyMessage;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -41,6 +42,7 @@ public class ScreenChooseController {
     private Button readyButton;
     private boolean isReady = false;
     private volatile boolean gameWindowOpened = false;
+
 
     // Mapa statków do umieszczenia
     private Map<ShipType, Rectangle> availableShips = new HashMap<>();
@@ -389,22 +391,40 @@ public class ScreenChooseController {
 
                 System.out.println("[SHIP PLACEMENT]: Player " + playerId + " is ready! All ships placed.");
 
-                // KRYTYCZNE: Ustaw listenery dla zmian stanu gry
+                // KRYTYCZNE: Ustaw listenery dla zmian stanu gry PRZED wysłaniem gotowości
                 if (battleshipClient != null) {
                     battleshipClient.setGameStateListener(this::handleGameStateChange);
                     battleshipClient.setGameUpdateListener(this::handleGameUpdate);
                     System.out.println("[SHIP PLACEMENT]: Game listeners set for player " + playerId);
+
+                    // NOWE: Wyślij wiadomość o gotowości do serwera
+                    sendPlayerReady();
                 } else {
                     System.err.println("[SHIP PLACEMENT]: BattleshipClient is null!");
                 }
             }
         });
 
+
+
+
         // Dodaj przycisk do dolnej części panelu statków
         if (shipContainer != null) {
             VBox buttonContainer = new VBox(readyButton);
             buttonContainer.setStyle("-fx-alignment: center; -fx-padding: 20px;");
             shipContainer.getChildren().add(buttonContainer);
+        }
+    }
+
+    private void sendPlayerReady() {
+        if (battleshipClient != null && gameId != null) {
+            // Użyj nowego typu wiadomości PlayerReadyMessage
+            PlayerReadyMessage readyMessage = new PlayerReadyMessage(playerId, gameId);
+            battleshipClient.sendMessage(readyMessage);
+
+            System.out.println("[SHIP PLACEMENT]: Sent PLAYER_READY message for player " + playerId);
+        } else {
+            System.err.println("[SHIP PLACEMENT]: Cannot send ready message - client or gameId is null");
         }
     }
 

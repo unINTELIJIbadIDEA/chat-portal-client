@@ -225,6 +225,7 @@ public class RoomScreenController {
         System.out.println("[ROOM CONTROLLER]: Players: " + gameUpdate.getGame().getPlayerBoards().keySet());
         System.out.println("[ROOM CONTROLLER]: Current player ID: " + playerId);
         System.out.println("[ROOM CONTROLLER]: Ship placement opened flag: " + shipPlacementOpened);
+        System.out.println("[ROOM CONTROLLER]: Game window opened flag: " + gameWindowOpened);
 
         Platform.runLater(() -> {
             if (waitingLabel != null) {
@@ -249,8 +250,12 @@ public class RoomScreenController {
                         break;
 
                     case PLAYING:
+                        // KRYTYCZNE: Sprawdź czy okno nie zostało już otwarte
                         if (!gameWindowOpened) {
+                            System.out.println("[ROOM CONTROLLER]: Transitioning to PLAYING state");
                             handlePlayingState();
+                        } else {
+                            System.out.println("[ROOM CONTROLLER]: Game window already opened, skipping");
                         }
                         break;
 
@@ -297,7 +302,17 @@ public class RoomScreenController {
         if (!gameWindowOpened) {
             gameWindowOpened = true;
             System.out.println("[ROOM CONTROLLER]: Opening game window for player: " + playerId);
-            openGameWindow();
+
+            // Użyj Platform.runLater z opóźnieniem dla płynności
+            Platform.runLater(() -> {
+                try {
+                    Thread.sleep(300); // Krótkie opóźnienie
+                    openGameWindow();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    gameWindowOpened = false; // Reset flagi w przypadku błędu
+                }
+            });
         } else {
             System.out.println("[ROOM CONTROLLER]: Game window already opened, skipping...");
         }
