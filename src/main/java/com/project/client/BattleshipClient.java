@@ -148,39 +148,65 @@ public class BattleshipClient {
 
     private void startReceiving() {
         receiverThread = new Thread(() -> {
-            System.out.println("[BATTLESHIP CLIENT]: Receiver thread started");
-
             while (running && socket != null && socket.isConnected() && !socket.isClosed()) {
                 try {
+                    System.out.println("[BATTLESHIP CLIENT]: Waiting for message from server...");
                     BattleshipMessage message = (BattleshipMessage) in.readObject();
-                    lastMessageTime = System.currentTimeMillis();
-
                     System.out.println("[BATTLESHIP CLIENT]: Received message: " + message.getType());
+
+                    // WAŻNE: Obsłuż wiadomość natychmiast w tym wątku
                     handleMessage(message);
 
                 } catch (java.net.SocketTimeoutException e) {
-                    // Timeout to normalne - sprawdź czy połączenie jeszcze żyje
-                    if (System.currentTimeMillis() - lastMessageTime > CONNECTION_TIMEOUT) {
-                        System.err.println("[BATTLESHIP CLIENT]: Connection timeout - attempting reconnect");
-                        attemptReconnection();
-                        break;
-                    }
+                    // To jest normalne - timeout oznacza brak wiadomości
+                    System.out.println("[BATTLESHIP CLIENT]: No message received (timeout)");
                     continue;
-
-                } catch (IOException | ClassNotFoundException e) {
+                } catch (IOException e) {
                     if (running) {
                         System.err.println("[BATTLESHIP CLIENT]: Error receiving message: " + e.getMessage());
-                        attemptReconnection();
+                        // Spróbuj ponownie połączyć tylko jeśli to nie jest zamknięcie
+                        if (!(e instanceof EOFException)) {
+                            attemptReconnection();
+                        }
                     }
                     break;
+                } catch (ClassNotFoundException e) {
+                    System.err.println("[BATTLESHIP CLIENT]: Unknown message class: " + e.getMessage());
                 }
             }
-
             System.out.println("[BATTLESHIP CLIENT]: Receiver thread ended");
         });
         receiverThread.setDaemon(true);
         receiverThread.start();
     }
+
+    private void startStateChecker() {
+        Thread stateChecker = new Thread(() -> {
+            int checkCount = 0;
+            while (running && checkCount < 10) { // Sprawdź max 10 razy
+                try {
+                    Thread.sleep(2000); // Co 2 sekundy
+                    if (isConnected() && lastJoinMessage != null) {
+                        System.out.println("[BATTLESHIP CLIENT]: Periodic state check #" + (checkCount + 1));
+                        forceGameStateRefresh();
+                    }
+                    checkCount++;
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        });
+        stateChecker.setDaemon(true);
+        stateChecker.start();
+    }
+
+    public void forceGameStateRefresh() {
+        if (lastJoinMessage != null && isConnected()) {
+            System.out.println("[BATTLESHIP CLIENT]: Forcing game state refresh...");
+            sendMessage(lastJoinMessage);
+        }
+    }
+
 
     private void startHeartbeat() {
         heartbeatThread = new Thread(() -> {

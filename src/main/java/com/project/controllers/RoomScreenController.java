@@ -93,6 +93,9 @@ public class RoomScreenController {
 
             System.out.println("[ROOM CONTROLLER]: Connected to battleship server successfully");
 
+            // NOWE: Uruchom okresowe sprawdzanie stanu
+            Platform.runLater(this::startPeriodicStateCheck);
+
             // Uruchom monitor połączenia
             startConnectionMonitor();
 
@@ -379,4 +382,22 @@ public class RoomScreenController {
         }
         return -1;
     }
+
+    private void startPeriodicStateCheck() {
+        // Użyj JavaFX Timeline dla bezpiecznego odświeżania UI
+        javafx.animation.Timeline timeline = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(
+                        javafx.util.Duration.seconds(3), // Co 3 sekundy
+                        e -> {
+                            if (battleshipClient != null && battleshipClient.isConnected() && !shipPlacementOpened) {
+                                System.out.println("[ROOM CONTROLLER]: Periodic state check - requesting update");
+                                battleshipClient.forceGameStateRefresh();
+                            }
+                        }
+                )
+        );
+        timeline.setCycleCount(10); // Sprawdź maksymalnie 10 razy (30 sekund)
+        timeline.play();
+    }
+
 }
