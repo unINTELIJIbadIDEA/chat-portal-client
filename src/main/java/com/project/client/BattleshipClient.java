@@ -13,6 +13,7 @@ public class BattleshipClient {
     private ObjectInputStream in;
     private volatile boolean running = false;
     private Thread receiverThread;
+    private Thread heartbeatThread;
     private JoinGameMessage lastJoinMessage;
 
     // Listenery dla różnych eventów
@@ -20,82 +21,123 @@ public class BattleshipClient {
     private Consumer<GameUpdateMessage> gameUpdateListener;
     private Consumer<ShotResultMessage> shotResultListener;
 
+    private String lastGameId;
+    private int lastPlayerId;
+    private String lastChatId;
+
+    // Heartbeat
+    private volatile long lastMessageTime = System.currentTimeMillis();
+    private static final long HEARTBEAT_INTERVAL = 10000; // 10 sekund
+    private static final long CONNECTION_TIMEOUT = 30000; // 30 sekund
+
     public BattleshipClient(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
     public void connect() throws IOException {
-        try {
-            System.out.println("[BATTLESHIP CLIENT]: Connecting to " + host + ":" + port);
-            socket = new Socket(host, port);
+        disconnect(); // Zamknij poprzednie połączenie jeśli istnieje
 
-            // DODAJ: Ustaw timeout dla socket
-            socket.setSoTimeout(30000); // 30 sekund timeout
-            socket.setKeepAlive(true);   // Włącz keep-alive
+        int maxRetries = 3;
+        int retryCount = 0;
 
-            System.out.println("[BATTLESHIP CLIENT]: Socket connected");
+        while (retryCount < maxRetries) {
+            try {
+                System.out.println("[BATTLESHIP CLIENT]: Connection attempt " + (retryCount + 1) + "/" + maxRetries);
 
-            System.out.println("[BATTLESHIP CLIENT]: Initializing output stream...");
-            out = new ObjectOutputStream(socket.getOutputStream());
-            out.flush();
-            System.out.println("[BATTLESHIP CLIENT]: Output stream ready");
+                socket = new Socket();
+                socket.setSoTimeout(5000); // 5s timeout dla connect
+                socket.connect(new java.net.InetSocketAddress(host, port), 10000);
 
-            // Krótsze opóźnienie
-            Thread.sleep(100);
+                // Konfiguracja socket
+                socket.setKeepAlive(true);
+                socket.setTcpNoDelay(true);
+                socket.setSoTimeout(15000); // 15s timeout dla operacji
 
-            System.out.println("[BATTLESHIP CLIENT]: Initializing input stream...");
-            in = new ObjectInputStream(socket.getInputStream());
-            System.out.println("[BATTLESHIP CLIENT]: Input stream ready");
+                System.out.println("[BATTLESHIP CLIENT]: Socket connected to " + host + ":" + port);
 
-            running = true;
-            startReceiving();
+                // Inicjalizacja streamów
+                out = new ObjectOutputStream(socket.getOutputStream());
+                out.flush();
 
-            System.out.println("[BATTLESHIP CLIENT]: Successfully connected to battleship server");
+                Thread.sleep(500); // Dłuższe opóźnienie
 
-        } catch (Exception e) {
-            System.err.println("[BATTLESHIP CLIENT]: Connection failed: " + e.getMessage());
-            e.printStackTrace();
-            throw new IOException("Failed to connect to battleship server", e);
+                in = new ObjectInputStream(socket.getInputStream());
+
+                running = true;
+                lastMessageTime = System.currentTimeMillis();
+
+                startReceiving();
+                startHeartbeat();
+
+                System.out.println("[BATTLESHIP CLIENT]: Successfully connected to battleship server");
+                return;
+
+            } catch (Exception e) {
+                retryCount++;
+                System.err.println("[BATTLESHIP CLIENT]: Connection attempt " + retryCount + " failed: " + e.getMessage());
+
+                if (retryCount < maxRetries) {
+                    try {
+                        Thread.sleep(2000 * retryCount); // Zwiększaj opóźnienie
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new IOException("Connection interrupted");
+                    }
+                }
+            }
         }
+
+        throw new IOException("Failed to connect after " + maxRetries + " attempts");
     }
 
     public void disconnect() {
         running = false;
+
         try {
             if (receiverThread != null) {
                 receiverThread.interrupt();
             }
+            if (heartbeatThread != null) {
+                heartbeatThread.interrupt();
+            }
             if (out != null) out.close();
             if (in != null) in.close();
             if (socket != null) socket.close();
-
-            System.out.println("[BATTLESHIP CLIENT]: Disconnected from battleship server");
         } catch (IOException e) {
             System.err.println("[BATTLESHIP CLIENT]: Error during disconnect: " + e.getMessage());
         }
+
+        System.out.println("[BATTLESHIP CLIENT]: Disconnected from battleship server");
     }
 
     public void sendMessage(BattleshipMessage message) {
+        if (!isConnected()) {
+            System.err.println("[BATTLESHIP CLIENT]: Cannot send message - not connected");
+            if (running) {
+                attemptReconnection();
+            }
+            return;
+        }
+
         try {
-            if (out != null && running && socket != null && socket.isConnected()) {
-                System.out.println("[BATTLESHIP CLIENT]: Sending message: " + message.getType());
+            System.out.println("[BATTLESHIP CLIENT]: Sending message: " + message.getType());
 
-                // ZAPISZ JOIN_GAME message do ponownego wysłania
-                if (message instanceof JoinGameMessage) {
-                    lastJoinMessage = (JoinGameMessage) message;
-                }
+            // Zapisz dane do ponownego połączenia
+            if (message instanceof JoinGameMessage) {
+                JoinGameMessage joinMsg = (JoinGameMessage) message;
+                lastGameId = joinMsg.getGameId();
+                lastPlayerId = joinMsg.getPlayerId();
+                lastChatId = joinMsg.getChatId();
+            }
 
+            synchronized (out) { // Synchronizacja dostępu do out
                 out.writeObject(message);
                 out.flush();
-                System.out.println("[BATTLESHIP CLIENT]: Message sent successfully");
-            } else {
-                System.err.println("[BATTLESHIP CLIENT]: Cannot send message - not connected");
-                // PRÓBUJ ponowne połączenie
-                if (running) {
-                    attemptReconnection();
-                }
             }
+
+            System.out.println("[BATTLESHIP CLIENT]: Message sent successfully");
+
         } catch (IOException e) {
             System.err.println("[BATTLESHIP CLIENT]: Error sending message: " + e.getMessage());
             if (running) {
@@ -106,51 +148,99 @@ public class BattleshipClient {
 
     private void startReceiving() {
         receiverThread = new Thread(() -> {
+            System.out.println("[BATTLESHIP CLIENT]: Receiver thread started");
+
             while (running && socket != null && socket.isConnected() && !socket.isClosed()) {
                 try {
-                    System.out.println("[BATTLESHIP CLIENT]: Waiting for message from server...");
                     BattleshipMessage message = (BattleshipMessage) in.readObject();
+                    lastMessageTime = System.currentTimeMillis();
+
                     System.out.println("[BATTLESHIP CLIENT]: Received message: " + message.getType());
                     handleMessage(message);
+
                 } catch (java.net.SocketTimeoutException e) {
-                    // To jest normalne - timeout oznacza brak wiadomości
-                    System.out.println("[BATTLESHIP CLIENT]: No message received (timeout)");
+                    // Timeout to normalne - sprawdź czy połączenie jeszcze żyje
+                    if (System.currentTimeMillis() - lastMessageTime > CONNECTION_TIMEOUT) {
+                        System.err.println("[BATTLESHIP CLIENT]: Connection timeout - attempting reconnect");
+                        attemptReconnection();
+                        break;
+                    }
                     continue;
+
                 } catch (IOException | ClassNotFoundException e) {
                     if (running) {
                         System.err.println("[BATTLESHIP CLIENT]: Error receiving message: " + e.getMessage());
-                        if (e instanceof StreamCorruptedException) {
-                            System.err.println("[BATTLESHIP CLIENT]: Stream corrupted - this may be caused by proxy/tunnel");
-                        }
-                        // DODAJ: Próba ponownego połączenia
                         attemptReconnection();
                     }
                     break;
                 }
             }
+
             System.out.println("[BATTLESHIP CLIENT]: Receiver thread ended");
         });
         receiverThread.setDaemon(true);
         receiverThread.start();
     }
 
+    private void startHeartbeat() {
+        heartbeatThread = new Thread(() -> {
+            System.out.println("[BATTLESHIP CLIENT]: Heartbeat thread started");
+
+            while (running) {
+                try {
+                    Thread.sleep(HEARTBEAT_INTERVAL);
+
+                    if (running && isConnected()) {
+                        // Wyślij heartbeat - może być dowolną wiadomością
+                        if (lastGameId != null && lastPlayerId != 0) {
+                            sendMessage(new JoinGameMessage(lastPlayerId, lastGameId, lastChatId));
+                        }
+                    }
+
+                } catch (InterruptedException e) {
+                    break;
+                } catch (Exception e) {
+                    System.err.println("[BATTLESHIP CLIENT]: Heartbeat error: " + e.getMessage());
+                }
+            }
+
+            System.out.println("[BATTLESHIP CLIENT]: Heartbeat thread ended");
+        });
+        heartbeatThread.setDaemon(true);
+        heartbeatThread.start();
+    }
+
     private void attemptReconnection() {
         if (!running) return;
 
-        System.out.println("[BATTLESHIP CLIENT]: Attempting to reconnect...");
+        System.out.println("[BATTLESHIP CLIENT]: Attempting reconnection...");
+
         try {
             disconnect();
-            Thread.sleep(2000);
+            Thread.sleep(3000); // Poczekaj 3 sekundy
             connect();
 
-            // Wyślij ponownie JOIN_GAME jeśli mamy dane
-            if (lastJoinMessage != null) {
-                sendMessage(lastJoinMessage);
+            // Wyślij ponownie JOIN_GAME
+            if (lastGameId != null && lastPlayerId != 0) {
+                Thread.sleep(1000); // Poczekaj na ustabilizowanie połączenia
+                sendMessage(new JoinGameMessage(lastPlayerId, lastGameId, lastChatId));
             }
+
+            System.out.println("[BATTLESHIP CLIENT]: Reconnection successful");
 
         } catch (Exception e) {
             System.err.println("[BATTLESHIP CLIENT]: Reconnection failed: " + e.getMessage());
-            running = false;
+            // Próbuj ponownie za 5 sekund
+            new Thread(() -> {
+                try {
+                    Thread.sleep(5000);
+                    if (running) {
+                        attemptReconnection();
+                    }
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
         }
     }
 
@@ -168,16 +258,11 @@ public class BattleshipClient {
                 if (gameUpdateListener != null) {
                     System.out.println("[BATTLESHIP CLIENT]: Calling gameUpdateListener...");
                     gameUpdateListener.accept(gameUpdate);
-                } else {
-                    System.err.println("[BATTLESHIP CLIENT]: gameUpdateListener is NULL!");
                 }
 
-                // Powiadom o zmianie stanu gry
                 if (gameStateListener != null) {
                     System.out.println("[BATTLESHIP CLIENT]: Calling gameStateListener with state: " + gameUpdate.getGame().getState());
                     gameStateListener.accept(gameUpdate.getGame().getState().toString());
-                } else {
-                    System.err.println("[BATTLESHIP CLIENT]: gameStateListener is NULL!");
                 }
                 break;
 
