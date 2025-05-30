@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.project.ChatPortal;
 import com.project.utils.Config;
 import com.project.utils.SessionManager;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +19,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
+import javafx.scene.input.MouseEvent;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -40,6 +43,9 @@ public class ChatScreenController {
     @FXML
     private Button addChatButton;
 
+    @FXML
+    private Button logoutButton;
+
     public void initialize() {
         loadConversations();
 
@@ -51,6 +57,7 @@ public class ChatScreenController {
 
         addChatButton.setOnAction(event -> handleAddChatButton());
         postsButton.setOnAction(event -> handlePostsButton());
+        logoutButton.setOnAction(event -> handleLogOutButtonAction());
     }
 
     private void loadChat(String chatId) {
@@ -124,6 +131,28 @@ public class ChatScreenController {
         }
     }
 
+    @FXML
+    private void handleLogOutButtonAction() {
+        try {
+
+            URL resource = ChatPortal.class.getResource("startscreen.fxml");
+            FXMLLoader loader = new FXMLLoader(resource);
+            Parent root = loader.load();
+
+            Stage newStage = new Stage();
+            newStage.setTitle("TextPortal");
+            newStage.setScene(new Scene(root));
+            newStage.show();
+
+            Stage currentStage = (Stage) logoutButton.getScene().getWindow();
+            currentStage.close();
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -155,5 +184,23 @@ public class ChatScreenController {
 
     public void onPostsButtonClicked(ActionEvent actionEvent) {
 
+    }
+
+    @FXML
+    private void onButtonHover(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        ScaleTransition scaleUp = new ScaleTransition(Duration.millis(150), button);
+        scaleUp.setToX(0.9);
+        scaleUp.setToY(0.9);
+        scaleUp.play();
+    }
+
+    @FXML
+    private void onButtonExit(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        ScaleTransition scaleDown = new ScaleTransition(Duration.millis(150), button);
+        scaleDown.setToX(1.0);
+        scaleDown.setToY(1.0);
+        scaleDown.play();
     }
 }

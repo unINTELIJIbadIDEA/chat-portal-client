@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.project.models.Post;
 import com.project.utils.Config;
 import com.project.utils.SessionManager;
+import javafx.animation.ScaleTransition;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -12,11 +13,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,6 +38,7 @@ public class AccountPostController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         HttpRequest requestGet = HttpRequest.newBuilder()
                 .uri(URI.create("http://" + Config.getHOST_SERVER() + ":" + Config.getPORT_API() + "/api/posts/"))
                 .header("Authorization", "Bearer " + SessionManager.getInstance().getToken())
@@ -114,6 +118,12 @@ public class AccountPostController implements Initializable {
                 postsView.getChildren().add(postBox);
             }
 
+            addPostButton.setOnMouseEntered(this::onMouseEntered);
+            addPostButton.setOnMouseExited(this::onMouseExited);
+            addPostButton.setOnMousePressed(this::onMousePressed);
+            addPostButton.setOnMouseReleased(this::onMouseReleased);
+
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -184,13 +194,39 @@ public class AccountPostController implements Initializable {
 
         VBox dialogVBox = new VBox(10, textField, confirmButton);
         dialogVBox.setPadding(new Insets(20));
-        dialogVBox.setPrefSize(450, 150); // ustawienie rozmiaru okna
+        dialogVBox.setPrefSize(450, 150);
 
         Scene dialogScene = new Scene(dialogVBox);
         dialogStage.setScene(dialogScene);
-        dialogStage.setWidth(500);  // ustawienie szerokości okna
-        dialogStage.setHeight(200); // ustawienie wysokości okna
+        dialogStage.setWidth(500);
+        dialogStage.setHeight(200);
         dialogStage.showAndWait();
+    }
+
+    private void onMouseEntered(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        button.setStyle("-fx-background-color: #ffe0b2; -fx-border-color: grey; -fx-border-radius: 10px; -fx-background-radius: 10px;");
+    }
+
+    private void onMouseExited(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        button.setStyle("-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10px; -fx-background-radius: 10px;");
+    }
+
+    private void onMousePressed(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(150), button);
+        scaleTransition.setToX(0.9);
+        scaleTransition.setToY(0.9);
+        scaleTransition.play();
+    }
+
+    private void onMouseReleased(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(150), button);
+        scaleTransition.setToX(1.0);
+        scaleTransition.setToY(1.0);
+        scaleTransition.play();
     }
 
 }
