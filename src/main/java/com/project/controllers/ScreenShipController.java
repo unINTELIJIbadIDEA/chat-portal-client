@@ -1,7 +1,7 @@
 package com.project.controllers;
 
 import com.project.client.BattleshipClient;
-import com.project.models.battleship.ShotResult;
+import com.project.models.battleship.*;
 import com.project.models.battleship.messages.TakeShotMessage;
 import com.project.models.battleship.messages.ShotResultMessage;
 import com.project.models.battleship.messages.GameUpdateMessage;
@@ -10,10 +10,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
@@ -38,6 +40,7 @@ public class ScreenShipController {
     private int playerId;
     private boolean isMyTurn = false;
     private Label statusLabel;
+    private BattleshipGame currentGame;
 
     @FXML
     public void initialize() {
@@ -45,7 +48,7 @@ public class ScreenShipController {
             backgroundImage.fitWidthProperty().bind(root.widthProperty());
             backgroundImage.fitHeightProperty().bind(root.heightProperty());
 
-            // DODAJ TU - obsługa zamykania okna
+            // Obsługa zamykania okna
             Platform.runLater(() -> {
                 if (root.getScene() != null) {
                     root.getScene().getWindow().setOnCloseRequest(event -> {
@@ -58,7 +61,7 @@ public class ScreenShipController {
         }
 
         try {
-            // Ładuj plansze
+            // Ładuj planszę gracza
             FXMLLoader playerLoader = new FXMLLoader(getClass().getResource("/com/project/shipboard.fxml"));
             Node playerBoardNode = playerLoader.load();
             if (playerBoardNode instanceof GridPane) {
@@ -66,7 +69,8 @@ public class ScreenShipController {
                 playerBoardPane.getChildren().add(playerBoardNode);
             }
 
-            FXMLLoader enemyLoader = new FXMLLoader(getClass().getResource("/com/project/battleboard.fxml"));
+            // Ładuj planszę przeciwnika - użyj shipboard.fxml zamiast battleboard.fxml
+            FXMLLoader enemyLoader = new FXMLLoader(getClass().getResource("/com/project/shipboard.fxml"));
             Node enemyBoardNode = enemyLoader.load();
             if (enemyBoardNode instanceof GridPane) {
                 enemyBoard = (GridPane) enemyBoardNode;
@@ -93,7 +97,7 @@ public class ScreenShipController {
         this.playerId = playerId;
         this.battleshipClient = client;
 
-        // DODAJ TU - shutdown hook
+        // Shutdown hook
         if (this.battleshipClient != null) {
             this.battleshipClient.addShutdownHook();
         }
@@ -102,9 +106,12 @@ public class ScreenShipController {
         battleshipClient.setShotResultListener(this::handleShotResult);
         battleshipClient.setGameUpdateListener(this::handleGameUpdate);
 
+        // Poproś o aktualny stan gry
+        battleshipClient.requestGameUpdate();
+
         Platform.runLater(() -> {
             if (statusLabel != null) {
-                statusLabel.setText("Gra rozpoczęta! Oczekiwanie na turę...");
+                statusLabel.setText("Gra rozpoczęta! Oczekiwanie na dane...");
             }
         });
     }
@@ -113,8 +120,20 @@ public class ScreenShipController {
         if (enemyBoard == null) return;
 
         for (Node node : enemyBoard.getChildren()) {
-            if (node instanceof javafx.scene.control.Button) {
-                javafx.scene.control.Button cell = (javafx.scene.control.Button) node;
+            if (node instanceof Pane && !(node instanceof Label)) {
+                Pane cell = (Pane) node;
+
+                // Ustaw kursor na rękę dla komórek planszy
+                cell.setOnMouseEntered(e -> {
+                    if (isMyTurn && !cell.isDisabled()) {
+                        cell.setStyle(cell.getStyle() + "; -fx-cursor: hand;");
+                    }
+                });
+
+                cell.setOnMouseExited(e -> {
+                    cell.setStyle(cell.getStyle().replace("; -fx-cursor: hand;", ""));
+                });
+
                 cell.setOnMouseClicked(event -> {
                     if (event.getButton() == MouseButton.PRIMARY && isMyTurn) {
                         Integer col = GridPane.getColumnIndex(cell);
@@ -153,17 +172,136 @@ public class ScreenShipController {
 
     private void handleShotResult(ShotResultMessage shotResult) {
         Platform.runLater(() -> {
-            // Znajdź odpowiednią komórkę na planszy przeciwnika
-            updateEnemyBoard(shotResult.getX(), shotResult.getY(), shotResult.getResult());
+            // Znajdź odpowiednią komórkę na planszy
+            if (shotResult.getShooterId() == playerId) {
+                // To był nasz strzał - aktualizuj planszę przeciwnika
+                updateEnemyBoard(shotResult.getX(), shotResult.getY(), shotResult.getResult());
+            } else {
+                // To był strzał przeciwnika - aktualizuj naszą planszę
+                updatePlayerBoard(shotResult.getX(), shotResult.getY(), shotResult.getResult());
+            }
 
             // Aktualizuj status
-            if (statusLabel != null) {
+            updateStatusAfterShot(shotResult);
+        });
+    }
+
+    private void handleGameUpdate(GameUpdateMessage gameUpdate) {
+        this.currentGame = gameUpdate.getGame();
+
+        Platform.runLater(() -> {
+            // Wyświetl statki gracza na jego planszy
+            displayPlayerShips();
+
+            // Aktualizuj stan gry
+            int currentPlayerId = gameUpdate.getGame().getCurrentPlayer();
+            updateGameState(currentPlayerId);
+        });
+    }
+
+    private void displayPlayerShips() {
+        if (currentGame == null || playerBoard == null) return;
+
+        GameBoard myBoard = currentGame.getPlayerBoards().get(playerId);
+        if (myBoard == null) return;
+
+        // Wyczyść poprzednie oznaczenia
+        for (Node node : playerBoard.getChildren()) {
+            if (node instanceof Pane && !(node instanceof Label)) {
+                node.getStyleClass().removeAll("ship-placed", "cell-hit", "cell-miss");
+            }
+        }
+
+        // Wyświetl statki
+        for (PlacedShip placedShip : myBoard.getShips()) {
+            for (Position pos : placedShip.getPositions()) {
+                Pane cell = getCellAt(playerBoard, pos.getX() + 1, pos.getY() + 1); // +1 dla nagłówków
+                if (cell != null) {
+                    cell.getStyleClass().add("ship-placed");
+                }
+            }
+        }
+
+        // Wyświetl strzały przeciwnika
+        Cell[][] board = myBoard.getBoard();
+        for (int x = 0; x < GameBoard.getBoardSize(); x++) {
+            for (int y = 0; y < GameBoard.getBoardSize(); y++) {
+                if (board[x][y].isShot()) {
+                    Pane cell = getCellAt(playerBoard, x + 1, y + 1);
+                    if (cell != null) {
+                        if (board[x][y].hasShip()) {
+                            cell.getStyleClass().add("cell-hit");
+                        } else {
+                            cell.getStyleClass().add("cell-miss");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateEnemyBoard(int x, int y, ShotResult result) {
+        if (enemyBoard == null) return;
+
+        Pane cell = getCellAt(enemyBoard, x + 1, y + 1); // +1 dla nagłówków
+        if (cell != null) {
+            switch (result) {
+                case HIT:
+                case SUNK:
+                    cell.getStyleClass().add("cell-hit");
+                    break;
+                case MISS:
+                    cell.getStyleClass().add("cell-miss");
+                    break;
+            }
+        }
+    }
+
+    private void updatePlayerBoard(int x, int y, ShotResult result) {
+        if (playerBoard == null) return;
+
+        Pane cell = getCellAt(playerBoard, x + 1, y + 1); // +1 dla nagłówków
+        if (cell != null) {
+            switch (result) {
+                case HIT:
+                case SUNK:
+                    if (!cell.getStyleClass().contains("cell-hit")) {
+                        cell.getStyleClass().add("cell-hit");
+                    }
+                    break;
+                case MISS:
+                    if (!cell.getStyleClass().contains("cell-miss")) {
+                        cell.getStyleClass().add("cell-miss");
+                    }
+                    break;
+            }
+        }
+    }
+
+    private Pane getCellAt(GridPane board, int col, int row) {
+        for (Node node : board.getChildren()) {
+            Integer nodeCol = GridPane.getColumnIndex(node);
+            Integer nodeRow = GridPane.getRowIndex(node);
+            if (nodeCol == null) nodeCol = 0;
+            if (nodeRow == null) nodeRow = 0;
+
+            if (nodeCol == col && nodeRow == row && node instanceof Pane && !(node instanceof Label)) {
+                return (Pane) node;
+            }
+        }
+        return null;
+    }
+
+    private void updateStatusAfterShot(ShotResultMessage shotResult) {
+        if (statusLabel != null) {
+            if (shotResult.getShooterId() == playerId) {
+                // Nasz strzał
                 switch (shotResult.getResult()) {
                     case HIT:
                         statusLabel.setText("Trafienie! Strzelaj ponownie!");
                         statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn");
                         statusLabel.getStyleClass().add("your-turn");
-                        isMyTurn = true; // Kolejny strzał
+                        isMyTurn = true;
                         break;
                     case MISS:
                         statusLabel.setText("Pudło! Tura przeciwnika.");
@@ -178,12 +316,8 @@ public class ScreenShipController {
                         isMyTurn = true;
                         break;
                     case GAME_OVER:
-                        if (shotResult.getShooterId() == playerId) {
-                            showAlert("Zwycięstwo!", "Gratulacje! Wygrałeś grę!");
-                        } else {
-                            showAlert("Porażka", "Przeciwnik wygrał grę.");
-                        }
-                        statusLabel.setText("Gra zakończona!");
+                        showAlert("Zwycięstwo!", "Gratulacje! Wygrałeś grę!");
+                        statusLabel.setText("Gra zakończona - Zwycięstwo!");
                         statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn");
                         break;
                     case ALREADY_SHOT:
@@ -195,43 +329,27 @@ public class ScreenShipController {
                         isMyTurn = true;
                         break;
                 }
-            }
-        });
-    }
-
-    private void handleGameUpdate(GameUpdateMessage gameUpdate) {
-        Platform.runLater(() -> {
-            // Aktualizuj stan gry
-            int currentPlayerId = gameUpdate.getGame().getCurrentPlayer();
-            updateGameState(currentPlayerId);
-        });
-    }
-
-    private void updateEnemyBoard(int x, int y, ShotResult result) {
-        if (enemyBoard == null) return;
-
-        for (Node node : enemyBoard.getChildren()) {
-            Integer col = GridPane.getColumnIndex(node);
-            Integer row = GridPane.getRowIndex(node);
-            if (col == null) col = 0;
-            if (row == null) row = 0;
-
-            // Uwzględnij nagłówki (+1)
-            if (col == x + 1 && row == y + 1 && node instanceof javafx.scene.control.Button) {
-                javafx.scene.control.Button cell = (javafx.scene.control.Button) node;
-
-                switch (result) {
+            } else {
+                // Strzał przeciwnika
+                switch (shotResult.getResult()) {
                     case HIT:
                     case SUNK:
-                        cell.getStyleClass().add("cell-hit");
-                        cell.setText("X");
+                        statusLabel.setText("Przeciwnik trafił! Jego tura kontynuowana.");
+                        statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn");
+                        statusLabel.getStyleClass().add("opponent-turn");
                         break;
                     case MISS:
-                        cell.getStyleClass().add("cell-miss");
-                        cell.setText("•");
+                        statusLabel.setText("Przeciwnik spudłował! Twoja tura.");
+                        statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn");
+                        statusLabel.getStyleClass().add("your-turn");
+                        isMyTurn = true;
+                        break;
+                    case GAME_OVER:
+                        showAlert("Porażka", "Przeciwnik wygrał grę.");
+                        statusLabel.setText("Gra zakończona - Porażka");
+                        statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn");
                         break;
                 }
-                break;
             }
         }
     }

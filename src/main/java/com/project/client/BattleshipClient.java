@@ -343,9 +343,15 @@ public class BattleshipClient {
     }
 
     public void requestGameUpdate() {
-        if (lastJoinMessage != null && isConnected()) {
+        if (lastGameId != null && lastPlayerId != 0 && lastChatId != null && isConnected()) {
             System.out.println("[BATTLESHIP CLIENT]: Requesting game update...");
+            JoinGameMessage requestUpdate = new JoinGameMessage(lastPlayerId, lastGameId, lastChatId);
+            sendMessage(requestUpdate);
+        } else if (lastJoinMessage != null && isConnected()) {
+            System.out.println("[BATTLESHIP CLIENT]: Requesting game update using last join message...");
             sendMessage(lastJoinMessage);
+        } else {
+            System.err.println("[BATTLESHIP CLIENT]: Cannot request game update - no game info available");
         }
     }
 
