@@ -61,10 +61,19 @@ public class BattleshipGame implements Serializable {
     }
 
     private void checkIfReadyToPlay() {
-        if (playersReady.values().stream().allMatch(ready -> ready)) {
+        System.out.println("[BATTLESHIP GAME]: Checking if ready to play...");
+        System.out.println("[BATTLESHIP GAME]: Players ready: " + playersReady);
+
+        boolean allReady = playersReady.size() == 2 &&
+                playersReady.values().stream().allMatch(ready -> ready != null && ready);
+
+        System.out.println("[BATTLESHIP GAME]: All players ready: " + allReady);
+
+        if (allReady) {
             state = GameState.PLAYING;
             // Pierwszy gracz zaczyna
             currentPlayer = playerBoards.keySet().iterator().next();
+            System.out.println("[BATTLESHIP GAME]: Game started! Current player: " + currentPlayer);
         }
     }
 
