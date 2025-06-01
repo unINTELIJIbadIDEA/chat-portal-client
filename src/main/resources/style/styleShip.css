@@ -51,6 +51,13 @@
     -fx-text-alignment: center;
 }
 
+.game-finished {
+    -fx-background-color: rgba(76, 175, 80, 0.9) !important;
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold !important;
+    -fx-font-size: 20px !important;
+}
+
 .ship{
     -fx-fill: #5583ae;
     -fx-stroke: black;
