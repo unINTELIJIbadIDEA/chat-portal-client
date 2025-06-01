@@ -54,23 +54,28 @@ public class GameBoard implements Serializable {
         int endX = horizontal ? startX + ship.getLength() - 1 : startX;
         int endY = horizontal ? startY : startY + ship.getLength() - 1;
 
-        // Debug
-        System.out.println("[GAMEBOARD]: Checking placement - start(" + startX + "," + startY + ") end(" + endX + "," + endY + ") horizontal=" + horizontal);
-
         // Czy statek mieści się w planszy?
         if (endX >= BOARD_SIZE || endY >= BOARD_SIZE || startX < 0 || startY < 0) {
-            System.out.println("[GAMEBOARD]: Ship out of bounds!");
             return false;
         }
 
-        // Sprawdź tylko komórki gdzie będzie statek (nie sprawdzaj otoczenia podczas stawiania)
+        // Sprawdź komórki statku i ich otoczenie
         for (int i = 0; i < ship.getLength(); i++) {
             int x = horizontal ? startX + i : startX;
             int y = horizontal ? startY : startY + i;
 
-            if (board[x][y].hasShip()) {
-                System.out.println("[GAMEBOARD]: Cell (" + x + "," + y + ") already occupied!");
-                return false;
+            // Sprawdź otoczenie każdej komórki statku
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    int checkX = x + dx;
+                    int checkY = y + dy;
+
+                    if (checkX >= 0 && checkX < BOARD_SIZE && checkY >= 0 && checkY < BOARD_SIZE) {
+                        if (board[checkX][checkY].hasShip()) {
+                            return false;
+                        }
+                    }
+                }
             }
         }
 
@@ -109,6 +114,7 @@ public class GameBoard implements Serializable {
     private void markSurroundingCells(Ship sunkShip) {
         for (PlacedShip placedShip : ships) {
             if (placedShip.getShip() == sunkShip) {
+                // Dla każdej pozycji statku, oznacz otoczenie
                 for (Position pos : placedShip.getPositions()) {
                     markSurrounding(pos.getX(), pos.getY());
                 }
@@ -118,10 +124,11 @@ public class GameBoard implements Serializable {
     }
 
     private void markSurrounding(int centerX, int centerY) {
+        // Oznacz szersze otoczenie statku
         for (int x = Math.max(0, centerX - 1); x <= Math.min(BOARD_SIZE - 1, centerX + 1); x++) {
             for (int y = Math.max(0, centerY - 1); y <= Math.min(BOARD_SIZE - 1, centerY + 1); y++) {
-                if (!board[x][y].hasShip()) {
-                    board[x][y].setShot(true);
+                if (!board[x][y].hasShip() && !board[x][y].isShot()) {
+                    board[x][y].setShot(true); // Oznacz jako ostrzelane
                 }
             }
         }

@@ -255,12 +255,36 @@ public class ScreenShipController {
         if (cell != null) {
             switch (result) {
                 case HIT:
-                case SUNK:
                     cell.getStyleClass().add("cell-hit");
+                    break;
+                case SUNK:
+                    cell.getStyleClass().add("ship-sunk");
+                    // Oznacz otoczenie zatopionych statków
+                    markSunkShipSurrounding(x, y);
                     break;
                 case MISS:
                     cell.getStyleClass().add("cell-miss");
                     break;
+            }
+        }
+    }
+
+    private void markSunkShipSurrounding(int centerX, int centerY) {
+        // Znajdź wszystkie komórki zatopinego statku i oznacz ich otoczenie
+        // Ta logika powinna być rozszerzona na podstawie informacji o statku z serwera
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                int checkX = centerX + dx;
+                int checkY = centerY + dy;
+
+                if (checkX >= 0 && checkX < 10 && checkY >= 0 && checkY < 10) {
+                    Pane surroundingCell = getCellAt(enemyBoard, checkX + 1, checkY + 1);
+                    if (surroundingCell != null && !surroundingCell.getStyleClass().contains("cell-hit")
+                            && !surroundingCell.getStyleClass().contains("ship-sunk")) {
+                        surroundingCell.getStyleClass().add("cell-sunk-area");
+                        surroundingCell.setDisable(true);
+                    }
+                }
             }
         }
     }

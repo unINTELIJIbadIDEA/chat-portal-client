@@ -70,6 +70,18 @@
     -fx-background-color: #a5d6a7 !important;
 }
 
+.cell-sunk-area {
+    -fx-background-color: #81d4fa !important;
+    -fx-border-color: #0277bd !important;
+    -fx-border-width: 1px !important;
+}
+
+.ship-sunk {
+    -fx-background-color: #d32f2f !important;
+    -fx-border-color: #b71c1c !important;
+    -fx-border-width: 2px !important;
+}
+
 .ship-placed {
     -fx-background-color: #1976d2 !important;
     -fx-border-color: #0d47a1 !important;

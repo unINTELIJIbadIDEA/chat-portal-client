@@ -250,17 +250,35 @@ public class ScreenChooseController {
             if (startRow + length > 10) return false;
         }
 
-        // Sprawdź czy komórki są wolne
+        // Sprawdź czy komórki są wolne i czy nie ma statków w otoczeniu
         for (int i = 0; i < length; i++) {
             int checkCol = horizontal ? startCol + i : startCol;
             int checkRow = horizontal ? startRow : startRow + i;
 
-            if (isCellOccupied(checkCol, checkRow)) {
+            if (isCellOccupiedWithSurrounding(checkCol, checkRow)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private boolean isCellOccupiedWithSurrounding(int col, int row) {
+        // Sprawdź komórkę i jej otoczenie (8 kierunków + sama komórka)
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                int checkCol = col + dx;
+                int checkRow = row + dy;
+
+                // Sprawdź czy w granicach planszy
+                if (checkCol >= 0 && checkCol < 10 && checkRow >= 0 && checkRow < 10) {
+                    if (isCellOccupied(checkCol, checkRow)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private boolean isCellOccupied(int col, int row) {
