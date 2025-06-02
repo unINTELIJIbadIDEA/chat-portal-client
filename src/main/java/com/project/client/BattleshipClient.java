@@ -15,6 +15,7 @@ public class BattleshipClient {
     private Thread receiverThread;
     private Thread heartbeatThread;
     private JoinGameMessage lastJoinMessage;
+    private Consumer<ShipSunkMessage> shipSunkListener;
 
     // Listenery dla różnych eventów
     private Consumer<String> gameStateListener;
@@ -330,6 +331,20 @@ public class BattleshipClient {
                 }
                 break;
 
+            case SHIP_SUNK:  // NOWY CASE
+                ShipSunkMessage shipSunkMsg = (ShipSunkMessage) message;
+                System.out.println("[BATTLESHIP CLIENT]: Ship sunk with " + shipSunkMsg.getShipPositions().size() + " positions");
+                if (shipSunkListener != null) {
+                    new Thread(() -> {
+                        try {
+                            shipSunkListener.accept(shipSunkMsg);
+                        } catch (Exception e) {
+                            System.err.println("[BATTLESHIP CLIENT]: Error in shipSunkListener: " + e.getMessage());
+                        }
+                    }).start();
+                }
+                break;
+
             case ERROR:
                 System.err.println("[BATTLESHIP CLIENT]: Server error: " + message);
                 break;
@@ -374,5 +389,9 @@ public class BattleshipClient {
 
     public boolean isConnected() {
         return socket != null && socket.isConnected() && !socket.isClosed() && running;
+    }
+
+    public void setShipSunkListener(Consumer<ShipSunkMessage> listener) {
+        this.shipSunkListener = listener;
     }
 }
