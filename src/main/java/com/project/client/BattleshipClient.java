@@ -93,23 +93,55 @@ public class BattleshipClient {
     }
 
     public void disconnect() {
+        System.out.println("[BATTLESHIP CLIENT]: === DISCONNECT INITIATED ===");
         running = false;
 
         try {
-            if (receiverThread != null) {
+            if (receiverThread != null && receiverThread.isAlive()) {
                 receiverThread.interrupt();
+                System.out.println("[BATTLESHIP CLIENT]: Receiver thread interrupted");
             }
-            if (heartbeatThread != null) {
-                heartbeatThread.interrupt();
-            }
-            if (out != null) out.close();
-            if (in != null) in.close();
-            if (socket != null) socket.close();
-        } catch (IOException e) {
-            System.err.println("[BATTLESHIP CLIENT]: Error during disconnect: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("[BATTLESHIP CLIENT]: Error interrupting receiver thread: " + e.getMessage());
         }
 
-        System.out.println("[BATTLESHIP CLIENT]: Disconnected from battleship server");
+        try {
+            if (heartbeatThread != null && heartbeatThread.isAlive()) {
+                heartbeatThread.interrupt();
+                System.out.println("[BATTLESHIP CLIENT]: Heartbeat thread interrupted");
+            }
+        } catch (Exception e) {
+            System.err.println("[BATTLESHIP CLIENT]: Error interrupting heartbeat thread: " + e.getMessage());
+        }
+
+        try {
+            if (out != null) {
+                out.close();
+                System.out.println("[BATTLESHIP CLIENT]: Output stream closed");
+            }
+        } catch (IOException e) {
+            System.err.println("[BATTLESHIP CLIENT]: Error closing output stream: " + e.getMessage());
+        }
+
+        try {
+            if (in != null) {
+                in.close();
+                System.out.println("[BATTLESHIP CLIENT]: Input stream closed");
+            }
+        } catch (IOException e) {
+            System.err.println("[BATTLESHIP CLIENT]: Error closing input stream: " + e.getMessage());
+        }
+
+        try {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+                System.out.println("[BATTLESHIP CLIENT]: Socket closed");
+            }
+        } catch (IOException e) {
+            System.err.println("[BATTLESHIP CLIENT]: Error closing socket: " + e.getMessage());
+        }
+
+        System.out.println("[BATTLESHIP CLIENT]: === DISCONNECT COMPLETE ===");
     }
 
     public void sendMessage(BattleshipMessage message) {

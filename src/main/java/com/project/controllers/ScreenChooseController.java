@@ -60,6 +60,15 @@ public class ScreenChooseController {
             Platform.runLater(() -> {
                 if (root.getScene() != null) {
                     root.getScene().getWindow().setOnCloseRequest(event -> {
+                        System.out.println("[SHIP PLACEMENT]: Window closing - disconnecting battleship client");
+                        if (battleshipClient != null) {
+                            battleshipClient.disconnect();
+                        }
+                    });
+
+                    // Dodaj też obsługę Alt+F4 i innych sposobów zamykania
+                    root.getScene().getWindow().setOnHiding(event -> {
+                        System.out.println("[SHIP PLACEMENT]: Window hiding - disconnecting battleship client");
                         if (battleshipClient != null) {
                             battleshipClient.disconnect();
                         }

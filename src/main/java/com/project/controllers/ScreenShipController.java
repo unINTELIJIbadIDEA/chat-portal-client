@@ -56,6 +56,15 @@ public class ScreenShipController {
             Platform.runLater(() -> {
                 if (root.getScene() != null) {
                     root.getScene().getWindow().setOnCloseRequest(event -> {
+                        System.out.println("[SCREEN SHIP]: Window closing - disconnecting battleship client");
+                        if (battleshipClient != null) {
+                            battleshipClient.disconnect();
+                        }
+                    });
+
+                    // Dodaj też obsługę ukrywania okna
+                    root.getScene().getWindow().setOnHiding(event -> {
+                        System.out.println("[SCREEN SHIP]: Window hiding - disconnecting battleship client");
                         if (battleshipClient != null) {
                             battleshipClient.disconnect();
                         }

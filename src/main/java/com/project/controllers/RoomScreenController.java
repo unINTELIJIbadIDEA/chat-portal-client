@@ -59,6 +59,16 @@ public class RoomScreenController {
                 });
             }
         });
+        Platform.runLater(() -> {
+            if (waitingLabel != null && waitingLabel.getScene() != null) {
+                waitingLabel.getScene().getWindow().setOnCloseRequest(event -> {
+                    System.out.println("[ROOM CONTROLLER]: Window closing - disconnecting battleship client");
+                    if (battleshipClient != null) {
+                        battleshipClient.disconnect();
+                    }
+                });
+            }
+        });
     }
 
     private void connectToBattleshipServer() {
