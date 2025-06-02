@@ -29,6 +29,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 
 public class ScreenShipController {
@@ -661,6 +663,23 @@ public class ScreenShipController {
         }
 
         System.out.println("[SCREEN SHIP]: === FORCED DISCONNECT COMPLETE ===");
+    }
+
+    private int extractCurrentUserId() {
+        String token = SessionManager.getInstance().getToken();
+        if (token != null && !token.isEmpty()) {
+            try {
+                String[] tokenParts = token.split("\\.");
+                if (tokenParts.length >= 2) {
+                    String payload = new String(Base64.getUrlDecoder().decode(tokenParts[1]), StandardCharsets.UTF_8);
+                    JsonObject jsonPayload = JsonParser.parseString(payload).getAsJsonObject();
+                    return jsonPayload.get("userId").getAsInt();
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return -1;
     }
 
 }
