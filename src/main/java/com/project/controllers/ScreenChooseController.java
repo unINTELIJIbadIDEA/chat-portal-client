@@ -56,7 +56,6 @@ public class ScreenChooseController {
             backgroundImage.fitWidthProperty().bind(root.widthProperty());
             backgroundImage.fitHeightProperty().bind(root.heightProperty());
 
-            // DODAJ TU - obsługa zamykania okna
             Platform.runLater(() -> {
                 if (root.getScene() != null) {
                     root.getScene().getWindow().setOnCloseRequest(event -> {
@@ -321,7 +320,7 @@ public class ScreenChooseController {
             battleshipClient.sendMessage(new PlaceShipMessage(playerId, gameId, shipType, startCol, startRow, horizontal));
         }
 
-        // Sprawdź czy wszystkie statki zostały umieszczone
+
         checkIfAllShipsPlaced();
     }
 
@@ -330,7 +329,7 @@ public class ScreenChooseController {
             int col = ship.horizontal ? ship.startCol + i : ship.startCol;
             int row = ship.horizontal ? ship.startRow : ship.startRow + i;
 
-            // Znajdź odpowiednią komórkę i pokoloruj ją (+1 dla nagłówków)
+
             for (Node node : gameBoard.getChildren()) {
                 Integer nodeCol = GridPane.getColumnIndex(node);
                 Integer nodeRow = GridPane.getRowIndex(node);
@@ -354,7 +353,7 @@ public class ScreenChooseController {
     }
 
     private void removeShipFromBoard(PlacedShipInfo ship) {
-        // Usuń wizualizację z planszy
+
         for (int i = 0; i < ship.shipType.getLength(); i++) {
             int col = ship.horizontal ? ship.startCol + i : ship.startCol;
             int row = ship.horizontal ? ship.startRow : ship.startRow + i;
@@ -374,10 +373,10 @@ public class ScreenChooseController {
             }
         }
 
-        // Usuń ze struktury danych
+
         placedShips.remove(ship);
 
-        // Przywróć statek do panelu wyboru
+
         createDraggableShip(ship.shipType, getShipColor(ship.shipType));
 
         checkIfAllShipsPlaced();
@@ -417,13 +416,12 @@ public class ScreenChooseController {
 
                 System.out.println("[SHIP PLACEMENT]: Player " + playerId + " is ready! All ships placed.");
 
-                // KRYTYCZNE: Ustaw listenery dla zmian stanu gry PRZED wysłaniem gotowości
                 if (battleshipClient != null) {
                     battleshipClient.setGameStateListener(this::handleGameStateChange);
                     battleshipClient.setGameUpdateListener(this::handleGameUpdate);
                     System.out.println("[SHIP PLACEMENT]: Game listeners set for player " + playerId);
 
-                    // NOWE: Wyślij wiadomość o gotowości do serwera
+
                     sendPlayerReady();
                 } else {
                     System.err.println("[SHIP PLACEMENT]: BattleshipClient is null!");
@@ -431,10 +429,6 @@ public class ScreenChooseController {
             }
         });
 
-
-
-
-        // Dodaj przycisk do dolnej części panelu statków
         if (shipContainer != null) {
             VBox buttonContainer = new VBox(readyButton);
             buttonContainer.setStyle("-fx-alignment: center; -fx-padding: 20px;");
@@ -454,7 +448,7 @@ public class ScreenChooseController {
         }
     }
 
-    // Klasa pomocnicza do przechowywania informacji o umieszczonych statkach
+
     private static class PlacedShipInfo {
         ShipType shipType;
         int startCol, startRow;

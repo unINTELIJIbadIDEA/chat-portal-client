@@ -85,7 +85,6 @@ public class ChatController {
         }
     }
 
-    // NOWA METODA - tworzenie gry w statki
     private void createBattleshipGame() {
         try {
             // Najpierw sprawdź czy nie ma pauzowanej gry
@@ -200,7 +199,6 @@ public class ChatController {
     }
 
     private HBox createMessageBubble(Message msg) {
-        // NOWA LOGIKA - sprawdź czy wiadomość zawiera informacje o grze
         if (msg.content().startsWith("[BATTLESHIP_GAME]")) {
             return createGameMessageBubble(msg);
         }
@@ -218,7 +216,7 @@ public class ChatController {
         return hBox;
     }
 
-    // NOWA METODA - tworzenie kafelka z grą
+
     private HBox createGameMessageBubble(Message msg) {
         try {
             // Parsuj dane gry z wiadomości
@@ -234,7 +232,7 @@ public class ChatController {
             String status = gameInfo.get("status").getAsString();
             Label statusLabel = new Label("Status: " + translateStatus(status));
 
-            // DODAJ RÓŻNE PRZYCISKI W ZALEŻNOŚCI OD STATUSU
+
             Button actionButton = createGameActionButton(gameInfo, status);
 
             gameBox.getChildren().addAll(gameLabel, statusLabel, actionButton);
@@ -255,7 +253,7 @@ public class ChatController {
         }
     }
 
-    // NOWA METODA - dołączanie do gry
+
     private void joinBattleshipGame(JsonObject gameInfo) {
         try {
             String gameId = gameInfo.get("gameId").getAsString();
@@ -291,7 +289,6 @@ public class ChatController {
         }
     }
 
-    // NOWA METODA - otwieranie okna gry
     private void openBattleshipWindow(JsonObject gameData) {
         if (battleshipWindowOpened) {
             System.out.println("[CHAT CONTROLLER]: Battleship window already opened, ignoring request");

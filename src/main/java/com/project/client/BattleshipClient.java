@@ -156,7 +156,7 @@ public class BattleshipClient {
         try {
             System.out.println("[BATTLESHIP CLIENT]: Sending message: " + message.getType());
 
-            // Zapisz dane do ponownego połączenia
+
             if (message instanceof JoinGameMessage) {
                 JoinGameMessage joinMsg = (JoinGameMessage) message;
                 lastGameId = joinMsg.getGameId();
@@ -164,7 +164,7 @@ public class BattleshipClient {
                 lastChatId = joinMsg.getChatId();
             }
 
-            synchronized (out) { // Synchronizacja dostępu do out
+            synchronized (out) {
                 out.writeObject(message);
                 out.flush();
             }
@@ -187,17 +187,17 @@ public class BattleshipClient {
                     BattleshipMessage message = (BattleshipMessage) in.readObject();
                     System.out.println("[BATTLESHIP CLIENT]: Received message: " + message.getType());
 
-                    // WAŻNE: Obsłuż wiadomość natychmiast w tym wątku
+
                     handleMessage(message);
 
                 } catch (java.net.SocketTimeoutException e) {
-                    // To jest normalne - timeout oznacza brak wiadomości
+
                     System.out.println("[BATTLESHIP CLIENT]: No message received (timeout)");
                     continue;
                 } catch (IOException e) {
                     if (running) {
                         System.err.println("[BATTLESHIP CLIENT]: Error receiving message: " + e.getMessage());
-                        // Spróbuj ponownie połączyć tylko jeśli to nie jest zamknięcie
+
                         if (!(e instanceof EOFException)) {
                             attemptReconnection();
                         }
@@ -363,7 +363,7 @@ public class BattleshipClient {
                 }
                 break;
 
-            case SHIP_SUNK:  // NOWY CASE
+            case SHIP_SUNK:
                 ShipSunkMessage shipSunkMsg = (ShipSunkMessage) message;
                 System.out.println("[BATTLESHIP CLIENT]: Ship sunk with " + shipSunkMsg.getShipPositions().size() + " positions");
                 if (shipSunkListener != null) {

@@ -29,7 +29,7 @@ public class RoomScreenController {
     private int playerId;
     private BattleshipClient battleshipClient;
 
-    // KRYTYCZNE: Flagi do kontroli otwierania okien
+
     private volatile boolean shipPlacementOpened = false;
     private volatile boolean gameWindowOpened = false;
 
@@ -46,10 +46,10 @@ public class RoomScreenController {
             }
         });
 
-        // Połącz z serwerem battleship w osobnym wątku
+
         new Thread(this::connectToBattleshipServer).start();
 
-        // Obsługa zamykania okna
+
         Platform.runLater(() -> {
             if (waitingLabel != null && waitingLabel.getScene() != null) {
                 waitingLabel.getScene().getWindow().setOnCloseRequest(event -> {
@@ -78,7 +78,7 @@ public class RoomScreenController {
 
             battleshipClient = new BattleshipClient(battleshipHost, battleshipPort);
 
-            // KRYTYCZNE: Ustaw listenery PRZED połączeniem
+
             battleshipClient.setGameStateListener(this::onGameStateChanged);
             battleshipClient.setGameUpdateListener(this::onGameUpdate);
             System.out.println("[ROOM CONTROLLER]: Listeners set before connection");
@@ -92,19 +92,19 @@ public class RoomScreenController {
                 }
             });
 
-            // Opóźnienie przed wysłaniem JOIN_GAME
+
             Thread.sleep(1000);
 
-            // Dołącz do gry
+
             JoinGameMessage joinMessage = new JoinGameMessage(playerId, gameId, chatId);
             battleshipClient.sendMessage(joinMessage);
 
             System.out.println("[ROOM CONTROLLER]: Connected to battleship server successfully");
 
-            // NOWE: Uruchom okresowe sprawdzanie stanu
+
             Platform.runLater(this::startPeriodicStateCheck);
 
-            // Uruchom monitor połączenia
+
             startConnectionMonitor();
 
         } catch (Exception e) {
@@ -242,13 +242,13 @@ public class RoomScreenController {
                 switch (state) {
                     case WAITING_FOR_PLAYERS:
                         waitingLabel.setText("Oczekiwanie na drugiego gracza...");
-                        // Reset flags
+
                         shipPlacementOpened = false;
                         gameWindowOpened = false;
                         break;
 
                     case SHIP_PLACEMENT:
-                        // KRYTYCZNE: Sprawdź czy okno nie zostało już otwarte
+
                         if (!shipPlacementOpened) {
                             System.out.println("[ROOM CONTROLLER]: Transitioning to SHIP_PLACEMENT state");
                             handleShipPlacementState();
@@ -258,7 +258,7 @@ public class RoomScreenController {
                         break;
 
                     case PLAYING:
-                        // KRYTYCZNE: Sprawdź czy okno nie zostało już otwarte
+
                         if (!gameWindowOpened) {
                             System.out.println("[ROOM CONTROLLER]: Transitioning to PLAYING state");
                             handlePlayingState();
@@ -282,12 +282,12 @@ public class RoomScreenController {
             waitingLabel.setText("Drugi gracz dołączył! Przygotowanie do gry...");
         }
 
-        // KRYTYCZNE: Ustaw flagę PRZED otwarciem okna
+
         if (!shipPlacementOpened) {
             shipPlacementOpened = true;
             System.out.println("[ROOM CONTROLLER]: Opening ship placement window for player: " + playerId);
 
-            // Użyj Platform.runLater dla bezpiecznego otwarcia okna
+
             Platform.runLater(() -> {
                 try {
                     Thread.sleep(500); // Krótkie opóźnienie dla płynności
@@ -311,7 +311,6 @@ public class RoomScreenController {
             gameWindowOpened = true;
             System.out.println("[ROOM CONTROLLER]: Opening game window for player: " + playerId);
 
-            // POPRAWKA: Sprawdź czy waitingLabel i scene są dostępne
             Platform.runLater(() -> {
                 try {
                     if (waitingLabel != null && waitingLabel.getScene() != null && waitingLabel.getScene().getWindow() != null) {
@@ -446,7 +445,6 @@ public class RoomScreenController {
     }
 
     private void startPeriodicStateCheck() {
-        // Użyj JavaFX Timeline dla bezpiecznego odświeżania UI
         javafx.animation.Timeline timeline = new javafx.animation.Timeline(
                 new javafx.animation.KeyFrame(
                         javafx.util.Duration.seconds(3), // Co 3 sekundy
@@ -458,7 +456,7 @@ public class RoomScreenController {
                         }
                 )
         );
-        timeline.setCycleCount(10); // Sprawdź maksymalnie 10 razy (30 sekund)
+        timeline.setCycleCount(10);
         timeline.play();
     }
 

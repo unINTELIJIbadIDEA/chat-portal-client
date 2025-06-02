@@ -64,7 +64,7 @@ public class ScreenShipController {
             backgroundImage.fitWidthProperty().bind(root.widthProperty());
             backgroundImage.fitHeightProperty().bind(root.heightProperty());
 
-            // POPRAWKA: Opóźnij ustawienie obsługi zamknięcia okna
+
             Platform.runLater(() -> {
                 setupWindowCloseHandlers();
             });
@@ -102,7 +102,7 @@ public class ScreenShipController {
         }
     }
 
-    // NOWA METODA: Bezpieczne ustawienie obsługi zamknięcia okna
+
     private void setupWindowCloseHandlers() {
         try {
             if (root != null && root.getScene() != null && root.getScene().getWindow() != null) {
@@ -142,11 +142,11 @@ public class ScreenShipController {
         this.playerId = playerId;
         this.battleshipClient = client;
 
-        // NOWE: Pobierz nick gracza
+
         try {
             String token = SessionManager.getInstance().getToken();
             if (token != null) {
-                // Dekoduj token żeby uzyskać informacje o graczu
+
                 Integer currentUserId = extractCurrentUserId();
                 if (currentUserId != null && currentUserId == playerId) {
                     this.playerNickname = getUserNicknameFromApi(currentUserId);
@@ -282,7 +282,7 @@ public class ScreenShipController {
         this.currentGame = gameUpdate.getGame();
 
         Platform.runLater(() -> {
-            // NOWE: Pobierz nick przeciwnika
+
             if (currentGame != null && opponentNickname.isEmpty()) {
                 int opponentId = currentGame.getPlayerBoards().keySet().stream()
                         .filter(id -> id != playerId)
@@ -301,7 +301,7 @@ public class ScreenShipController {
             // Wyświetl statki gracza na jego planszy
             displayPlayerShips();
 
-            // Aktualizuj stan gry
+
             int currentPlayerId = gameUpdate.getGame().getCurrentPlayer();
             updateGameState(currentPlayerId);
         });
@@ -313,14 +313,14 @@ public class ScreenShipController {
         GameBoard myBoard = currentGame.getPlayerBoards().get(playerId);
         if (myBoard == null) return;
 
-        // Wyczyść poprzednie oznaczenia
+
         for (Node node : playerBoard.getChildren()) {
             if (node instanceof Pane && !(node instanceof Label)) {
                 node.getStyleClass().removeAll("ship-placed", "cell-hit", "cell-miss");
             }
         }
 
-        // Wyświetl statki
+
         for (PlacedShip placedShip : myBoard.getShips()) {
             for (Position pos : placedShip.getPositions()) {
                 Pane cell = getCellAt(playerBoard, pos.getX() + 1, pos.getY() + 1); // +1 dla nagłówków
@@ -330,7 +330,7 @@ public class ScreenShipController {
             }
         }
 
-        // Wyświetl strzały przeciwnika
+
         Cell[][] board = myBoard.getBoard();
         for (int x = 0; x < GameBoard.getBoardSize(); x++) {
             for (int y = 0; y < GameBoard.getBoardSize(); y++) {
@@ -359,7 +359,7 @@ public class ScreenShipController {
                     break;
                 case SUNK:
                     cell.getStyleClass().add("cell-hit");
-                    // Otoczenie będzie oznaczone przez handleShipSunk
+
                     break;
                 case MISS:
                     cell.getStyleClass().add("cell-miss");
@@ -419,7 +419,7 @@ public class ScreenShipController {
 
         if (statusLabel != null) {
             if (shotResult.getShooterId() == playerId) {
-                // Nasz strzał
+
                 switch (shotResult.getResult()) {
                     case HIT:
                         statusLabel.setText("Trafienie! Strzelaj ponownie!");
@@ -466,7 +466,7 @@ public class ScreenShipController {
                         break;
                 }
             } else {
-                // Strzał przeciwnika
+
                 switch (shotResult.getResult()) {
                     case HIT:
                     case SUNK:
@@ -560,10 +560,10 @@ public class ScreenShipController {
             System.out.println("[SCREEN SHIP]: Handling ship sunk - " + shipSunkMsg.getShipPositions().size() + " positions");
 
             if (shipSunkMsg.getShooterId() == playerId) {
-                // To był nasz strzał - oznacz zatopiony statek na planszy przeciwnika
+
                 markSunkShipOnEnemyBoard(shipSunkMsg.getShipPositions());
             } else {
-                // To był strzał przeciwnika - oznacz zatopiony statek na naszej planszy
+
                 markSunkShipOnPlayerBoard(shipSunkMsg.getShipPositions());
             }
         });
