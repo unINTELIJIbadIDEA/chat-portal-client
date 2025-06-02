@@ -34,7 +34,6 @@
     -fx-background-radius: 5;
     -fx-border-radius: 5;
 }
-
 .border{
     -fx-fill:#455a64;
     -fx-stroke:#455a64;
@@ -63,4 +62,18 @@
 
 .chat {
     -fx-background-color: #ececec;
+}
+
+.buttonHover {
+    -fx-background-color: #ffe0b2;
+    -fx-border-color: grey;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.buttonNormal {
+    -fx-background-color: #fff8e1;
+    -fx-border-color: grey;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
 }
