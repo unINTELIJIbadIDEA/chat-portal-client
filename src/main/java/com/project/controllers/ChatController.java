@@ -208,6 +208,9 @@ public class ChatController implements Initializable {
     }
 
     private HBox createMessageBubble(Message msg) {
+        if (msg.content().startsWith("[BATTLESHIP_GAME]")) {
+            return createGameMessageBubble(msg);
+        }
         Label messageLabel = createMessageLabel(msg.content());
         int currentUserId = extractCurrentUserId();
 
