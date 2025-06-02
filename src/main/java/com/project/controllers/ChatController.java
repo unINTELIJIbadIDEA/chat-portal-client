@@ -10,8 +10,10 @@ import com.project.client.ClientSessionManager;
 import com.project.models.message.Message;
 import com.project.utils.Config;
 import com.project.utils.SessionManager;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,9 +23,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,7 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ChatController {
+public class ChatController implements Initializable {
     @FXML
     private ListView<HBox> messageList;
 
@@ -68,6 +72,7 @@ public class ChatController {
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
 
+
     public void setChatSession(String chatId, String bearerToken) {
         this.bearerToken = bearerToken;
         this.chatId = chatId;
@@ -79,10 +84,14 @@ public class ChatController {
     }
 
     @FXML
-    public void initialize() {
+    public void initialize(java.net.URL url, java.util.ResourceBundle resourceBundle) {
         if (createGameButton != null) {
             createGameButton.setOnAction(e -> createBattleshipGame());
         }
+        sendButton.setOnMouseEntered(this::onMouseEntered);
+        sendButton.setOnMouseExited(this::onMouseExited);
+        sendButton.setOnMousePressed(this::onMousePressed);
+        sendButton.setOnMouseReleased(this::onMouseReleased);
     }
 
     private void createBattleshipGame() {
@@ -199,10 +208,6 @@ public class ChatController {
     }
 
     private HBox createMessageBubble(Message msg) {
-        if (msg.content().startsWith("[BATTLESHIP_GAME]")) {
-            return createGameMessageBubble(msg);
-        }
-
         Label messageLabel = createMessageLabel(msg.content());
         int currentUserId = extractCurrentUserId();
 
@@ -512,5 +517,31 @@ public class ChatController {
         });
     }
 
+
+    private void onMouseEntered(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        button.setStyle("-fx-background-color: #ffe0b2; -fx-border-color: grey; -fx-border-radius: 10px; -fx-background-radius: 10px;");
+    }
+
+    private void onMouseExited(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        button.setStyle("-fx-background-color: #fff8e1; -fx-border-color: grey; -fx-border-radius: 10px; -fx-background-radius: 10px;");
+    }
+
+    private void onMousePressed(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(150), button);
+        scaleTransition.setToX(0.9);
+        scaleTransition.setToY(0.9);
+        scaleTransition.play();
+    }
+
+    private void onMouseReleased(MouseEvent event) {
+        Button button = (Button) event.getSource();
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(150), button);
+        scaleTransition.setToX(1.0);
+        scaleTransition.setToY(1.0);
+        scaleTransition.play();
+    }
 
 }

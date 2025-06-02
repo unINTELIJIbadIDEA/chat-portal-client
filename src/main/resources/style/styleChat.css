@@ -65,6 +65,20 @@
     -fx-background-color: #ececec;
 }
 
+.buttonHover {
+    -fx-background-color: #ffe0b2;
+    -fx-border-color: grey;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.buttonNormal {
+    -fx-background-color: #fff8e1;
+    -fx-border-color: grey;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
 /* === Style dla gier === */
 .game-message {
     -fx-background-color: #e3f2fd;
