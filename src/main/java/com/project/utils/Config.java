@@ -26,6 +26,10 @@ public class Config {
         return Integer.parseInt(properties.getProperty("SERVER_PORT"));
     }
 
+    public static Integer getBATTLESHIP_PORT() {
+        return Integer.parseInt(properties.getProperty("BATTLESHIP_PORT"));
+    }
+
     public static String getHOST_SERVER() {
         return properties.getProperty("SERVER_HOST");
     }

@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ public class BattleBoardController {
     private StackPane playerBoardPane;
 
     @FXML
-    private StackPane enemyBoardPane;
+    private GridPane enemyBoardPane;
 
     @FXML
     private StackPane root;
@@ -37,5 +38,9 @@ public class BattleBoardController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public GridPane getEnemyBoard() {
+        return enemyBoardPane;
     }
 }

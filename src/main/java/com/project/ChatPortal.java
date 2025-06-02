@@ -1,6 +1,7 @@
 package com.project;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -20,6 +21,16 @@ public class ChatPortal extends Application {
         stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
         stage.setScene(scene);
         stage.show();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("[CHAT PORTAL]: Application shutting down - cleaning up connections");
+        }));
+
+        stage.setOnCloseRequest(event -> {
+            System.out.println("[CHAT PORTAL]: Main window closing");
+            Platform.exit();
+            System.exit(0);
+        });
     }
 
 

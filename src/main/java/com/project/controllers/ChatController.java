@@ -14,14 +14,19 @@ import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.BufferedReader;
@@ -30,10 +35,15 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ChatController implements Initializable {
@@ -46,11 +56,18 @@ public class ChatController implements Initializable {
     @FXML
     private Button sendButton;
 
+    @FXML
+    private Button createGameButton;
+
     private ClientSessionManager clientSessionManager;
     private String bearerToken;
     private String chatId;
+    private HttpClient httpClient = HttpClient.newHttpClient();
+    private volatile boolean battleshipWindowOpened = false;
 
     private static final String API_URL = "http://" + Config.getHOST_SERVER() + ":" + Config.getPORT_API() + "/api/messages";
+    private static final String BATTLESHIP_API_URL = "http://" + Config.getHOST_SERVER() + ":" + Config.getPORT_API() + "/api/battleship";
+
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
@@ -66,6 +83,76 @@ public class ChatController implements Initializable {
         clientSessionManager.startSession();
     }
 
+    @FXML
+    public void initialize(java.net.URL url, java.util.ResourceBundle resourceBundle) {
+        if (createGameButton != null) {
+            createGameButton.setOnAction(e -> createBattleshipGame());
+        }
+        sendButton.setOnMouseEntered(this::onMouseEntered);
+        sendButton.setOnMouseExited(this::onMouseExited);
+        sendButton.setOnMousePressed(this::onMousePressed);
+        sendButton.setOnMouseReleased(this::onMouseReleased);
+    }
+
+    private void createBattleshipGame() {
+        try {
+            // Najpierw sprawdź czy nie ma pauzowanej gry
+            HttpRequest pausedGamesRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(BATTLESHIP_API_URL + "/chat/" + chatId + "/resume"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                    .build();
+
+            HttpResponse<String> pausedResponse = httpClient.send(pausedGamesRequest, HttpResponse.BodyHandlers.ofString());
+
+            if (pausedResponse.statusCode() == 200) {
+                // Znaleziono pauzowaną grę - wznów ją
+                JsonObject responseData = JsonParser.parseString(pausedResponse.body()).getAsJsonObject();
+                Platform.runLater(() -> {
+                    System.out.println("Resuming paused game...");
+                    openBattleshipWindow(responseData);
+                });
+                return;
+            }
+
+            // Nie ma pauzowanej gry - utwórz nową
+            String requestBody = gson.toJson(Map.of(
+                    "gameName", "Gra w statki - " + chatId,
+                    "chatId", chatId
+            ));
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BATTLESHIP_API_URL))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 201) {
+                // Nowa gra utworzona
+                System.out.println("Nowa gra utworzona pomyślnie!");
+            } else if (response.statusCode() == 200) {
+                // Użytkownik już ma grę - obsłuż rejoin
+                JsonObject responseData = JsonParser.parseString(response.body()).getAsJsonObject();
+                String action = responseData.get("action").getAsString();
+
+                if ("rejoin".equals(action)) {
+                    Platform.runLater(() -> {
+                        System.out.println("Rejoining existing game...");
+                        openBattleshipWindow(responseData);
+                    });
+                }
+            } else {
+                System.err.println("Błąd tworzenia gry: " + response.statusCode());
+                System.err.println("Response: " + response.body());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void loadMessages() {
         new Thread(() -> {
@@ -121,6 +208,9 @@ public class ChatController implements Initializable {
     }
 
     private HBox createMessageBubble(Message msg) {
+        if (msg.content().startsWith("[BATTLESHIP_GAME]")) {
+            return createGameMessageBubble(msg);
+        }
         Label messageLabel = createMessageLabel(msg.content());
         int currentUserId = extractCurrentUserId();
 
@@ -132,6 +222,124 @@ public class ChatController implements Initializable {
         hBox.setAlignment(isCurrentUser ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
 
         return hBox;
+    }
+
+
+    private HBox createGameMessageBubble(Message msg) {
+        try {
+            // Parsuj dane gry z wiadomości
+            String gameData = msg.content().substring("[BATTLESHIP_GAME]".length());
+            JsonObject gameInfo = JsonParser.parseString(gameData).getAsJsonObject();
+
+            VBox gameBox = new VBox(5);
+            gameBox.setStyle("-fx-background-color: #e3f2fd; -fx-border-color: #1976d2; -fx-border-width: 2px; -fx-border-radius: 10px; -fx-background-radius: 10px; -fx-padding: 10px;");
+
+            Label gameLabel = new Label("🚢 " + gameInfo.get("gameName").getAsString());
+            gameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+
+            String status = gameInfo.get("status").getAsString();
+            Label statusLabel = new Label("Status: " + translateStatus(status));
+
+
+            Button actionButton = createGameActionButton(gameInfo, status);
+
+            gameBox.getChildren().addAll(gameLabel, statusLabel, actionButton);
+
+            HBox hBox = new HBox(gameBox);
+            hBox.setPadding(new Insets(5, 10, 5, 10));
+            hBox.setAlignment(Pos.CENTER_LEFT);
+
+            return hBox;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Jeśli parsing się nie uda, zwróć normalną wiadomość
+            Label errorLabel = new Label("Gra w statki została utworzona");
+            HBox hBox = new HBox(errorLabel);
+            hBox.setPadding(new Insets(5, 10, 5, 10));
+            return hBox;
+        }
+    }
+
+
+    private void joinBattleshipGame(JsonObject gameInfo) {
+        try {
+            String gameId = gameInfo.get("gameId").getAsString();
+            String chatId = gameInfo.get("chatId").getAsString();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BATTLESHIP_API_URL + "/chat/" + chatId + "/join"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                JsonObject joinResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+                String action = joinResponse.has("action") ? joinResponse.get("action").getAsString() : "joined";
+
+                Platform.runLater(() -> {
+                    if ("rejoin".equals(action)) {
+                        System.out.println("Rejoining existing game...");
+                    } else {
+                        System.out.println("Joined new game...");
+                    }
+                    openBattleshipWindow(joinResponse);
+                });
+            } else {
+                handleGameJoinError(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() -> showGameError("Błąd połączenia", "Problem z połączeniem do serwera"));
+        }
+    }
+
+    private void openBattleshipWindow(JsonObject gameData) {
+        if (battleshipWindowOpened) {
+            System.out.println("[CHAT CONTROLLER]: Battleship window already opened, ignoring request");
+            return;
+        }
+
+        battleshipWindowOpened = true;
+        System.out.println("[CHAT CONTROLLER]: Opening battleship window...");
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/project/roomscreen.fxml"));
+            Parent root = loader.load();
+
+            // Przekaż dane gry do kontrolera
+            RoomScreenController controller = loader.getController();
+            if (controller != null) {
+                controller.initializeGame(
+                        gameData.get("gameId").getAsString(),
+                        gameData.get("chatId").getAsString(),
+                        gameData.get("battleshipServerPort").getAsInt(),
+                        bearerToken
+                );
+            }
+
+            // Otwórz w nowym oknie, nie zastępuj okna czatu
+            Stage battleshipStage = new Stage();
+            battleshipStage.setTitle("Gra w statki - Poczekalnia");
+            battleshipStage.setScene(new Scene(root, 1200, 800));
+
+            // KRYTYCZNE: Reset flagi po zamknięciu okna
+            battleshipStage.setOnCloseRequest(event -> {
+                battleshipWindowOpened = false;
+                System.out.println("[CHAT CONTROLLER]: Battleship window closed, flag reset");
+            });
+
+            battleshipStage.show();
+            System.out.println("[CHAT CONTROLLER]: Battleship window opened successfully");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            battleshipWindowOpened = false; // Reset flagi w przypadku błędu
+            System.err.println("[CHAT CONTROLLER]: Error opening battleship window: " + e.getMessage());
+        }
     }
 
     private Label createMessageLabel(String content) {
@@ -167,13 +375,151 @@ public class ChatController implements Initializable {
         }
     }
 
-    @Override
-    public void initialize(java.net.URL url, java.util.ResourceBundle resourceBundle) {
-        sendButton.setOnMouseEntered(this::onMouseEntered);
-        sendButton.setOnMouseExited(this::onMouseExited);
-        sendButton.setOnMousePressed(this::onMousePressed);
-        sendButton.setOnMouseReleased(this::onMouseReleased);
+    private void showGameError(String title, String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
+
+    private String translateStatus(String status) {
+        switch (status) {
+            case "WAITING": return "Oczekiwanie na gracza";
+            case "READY": return "Gotowe do gry";
+            case "PLAYING": return "W trakcie gry";
+            case "PAUSED": return "Zapauzowana";
+            case "FINISHED": return "Zakończona";
+            default: return status;
+        }
+    }
+
+    private Button createGameActionButton(JsonObject gameInfo, String status) {
+        Button actionButton = new Button();
+        actionButton.setStyle("-fx-background-color: #1976d2; -fx-text-fill: white; -fx-background-radius: 5px;");
+
+        switch (status) {
+            case "WAITING":
+                actionButton.setText("Dołącz do gry");
+                actionButton.setOnAction(e -> joinBattleshipGame(gameInfo));
+                break;
+
+            case "READY":
+                actionButton.setText("Dołącz do gry");
+                actionButton.setOnAction(e -> joinBattleshipGame(gameInfo));
+                break;
+
+            case "PLAYING":
+                actionButton.setText("Powróć do gry");
+                actionButton.setOnAction(e -> rejoinBattleshipGame(gameInfo));
+                break;
+
+            case "PAUSED":
+                actionButton.setText("Wznów grę");
+                actionButton.setOnAction(e -> resumeBattleshipGame(gameInfo));
+                break;
+
+            case "FINISHED":
+                actionButton.setText("Gra zakończona");
+                actionButton.setDisable(true);
+                actionButton.setStyle("-fx-background-color: #666666; -fx-text-fill: white; -fx-background-radius: 5px;");
+                break;
+
+            default:
+                actionButton.setText("Sprawdź grę");
+                actionButton.setOnAction(e -> checkBattleshipGame(gameInfo));
+                break;
+        }
+
+        return actionButton;
+    }
+
+
+    private void rejoinBattleshipGame(JsonObject gameInfo) {
+        try {
+            String gameId = gameInfo.get("gameId").getAsString();
+            String chatId = gameInfo.get("chatId").getAsString();
+
+            System.out.println("Rejoining playing game: " + gameId);
+
+            // Bezpośrednio otwórz okno gry z istniejącymi danymi
+            Platform.runLater(() -> {
+                openBattleshipWindow(gameInfo);
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() -> showGameError("Błąd", "Nie można powrócić do gry"));
+        }
+    }
+
+    private void resumeBattleshipGame(JsonObject gameInfo) {
+        try {
+            String chatId = gameInfo.get("chatId").getAsString();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BATTLESHIP_API_URL + "/chat/" + chatId + "/resume"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                JsonObject resumeResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+                Platform.runLater(() -> {
+                    System.out.println("Resuming paused game...");
+                    openBattleshipWindow(resumeResponse);
+                });
+            } else {
+                handleGameJoinError(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() -> showGameError("Błąd", "Nie można wznowić gry"));
+        }
+    }
+
+    private void checkBattleshipGame(JsonObject gameInfo) {
+        try {
+            String gameId = gameInfo.get("gameId").getAsString();
+
+            // Sprawdź aktualny status gry
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BATTLESHIP_API_URL + "/" + gameId))
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                JsonObject gameData = JsonParser.parseString(response.body()).getAsJsonObject();
+                Platform.runLater(() -> {
+                    openBattleshipWindow(gameData);
+                });
+            } else {
+                Platform.runLater(() -> showGameError("Błąd", "Nie można sprawdzić statusu gry"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() -> showGameError("Błąd", "Problem z połączeniem"));
+        }
+    }
+
+    private void handleGameJoinError(HttpResponse<String> response) {
+        Platform.runLater(() -> {
+            try {
+                JsonObject errorResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+                String errorMessage = errorResponse.get("error").getAsString();
+                showGameError("Błąd dołączania do gry", errorMessage);
+            } catch (Exception e) {
+                showGameError("Błąd dołączania do gry", "Nie można dołączyć do gry");
+            }
+        });
+    }
+
 
     private void onMouseEntered(MouseEvent event) {
         Button button = (Button) event.getSource();
