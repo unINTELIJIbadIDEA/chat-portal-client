@@ -60,17 +60,16 @@ public class ScreenChooseController {
             Platform.runLater(() -> {
                 if (root.getScene() != null) {
                     root.getScene().getWindow().setOnCloseRequest(event -> {
-                        System.out.println("[SHIP PLACEMENT]: Window closing - disconnecting battleship client");
+                        System.out.println("[SHIP PLACEMENT]: Window closing - forcing battleship client disconnect");
                         if (battleshipClient != null) {
-                            battleshipClient.disconnect();
+                            forceDisconnectFromPlacement();
                         }
                     });
 
-                    // Dodaj też obsługę Alt+F4 i innych sposobów zamykania
                     root.getScene().getWindow().setOnHiding(event -> {
-                        System.out.println("[SHIP PLACEMENT]: Window hiding - disconnecting battleship client");
+                        System.out.println("[SHIP PLACEMENT]: Window hiding - forcing battleship client disconnect");
                         if (battleshipClient != null) {
-                            battleshipClient.disconnect();
+                            forceDisconnectFromPlacement();
                         }
                     });
                 }
@@ -550,5 +549,15 @@ public class ScreenChooseController {
         }
     }
 
+    private void forceDisconnectFromPlacement() {
+        System.out.println("[SHIP PLACEMENT]: === FORCING IMMEDIATE DISCONNECT ===");
+
+        if (battleshipClient != null) {
+            battleshipClient.disconnect();
+            battleshipClient = null;
+        }
+
+        System.out.println("[SHIP PLACEMENT]: === FORCED DISCONNECT COMPLETE ===");
+    }
 
 }

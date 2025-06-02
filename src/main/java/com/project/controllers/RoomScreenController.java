@@ -53,18 +53,16 @@ public class RoomScreenController {
         Platform.runLater(() -> {
             if (waitingLabel != null && waitingLabel.getScene() != null) {
                 waitingLabel.getScene().getWindow().setOnCloseRequest(event -> {
+                    System.out.println("[ROOM CONTROLLER]: Window closing - forcing battleship client disconnect");
                     if (battleshipClient != null) {
-                        battleshipClient.disconnect();
+                        forceDisconnectFromRoom();
                     }
                 });
-            }
-        });
-        Platform.runLater(() -> {
-            if (waitingLabel != null && waitingLabel.getScene() != null) {
-                waitingLabel.getScene().getWindow().setOnCloseRequest(event -> {
-                    System.out.println("[ROOM CONTROLLER]: Window closing - disconnecting battleship client");
+
+                waitingLabel.getScene().getWindow().setOnHiding(event -> {
+                    System.out.println("[ROOM CONTROLLER]: Window hiding - forcing battleship client disconnect");
                     if (battleshipClient != null) {
-                        battleshipClient.disconnect();
+                        forceDisconnectFromRoom();
                     }
                 });
             }
@@ -423,6 +421,17 @@ public class RoomScreenController {
         );
         timeline.setCycleCount(10); // Sprawdź maksymalnie 10 razy (30 sekund)
         timeline.play();
+    }
+
+    private void forceDisconnectFromRoom() {
+        System.out.println("[ROOM CONTROLLER]: === FORCING IMMEDIATE DISCONNECT ===");
+
+        if (battleshipClient != null) {
+            battleshipClient.disconnect();
+            battleshipClient = null;
+        }
+
+        System.out.println("[ROOM CONTROLLER]: === FORCED DISCONNECT COMPLETE ===");
     }
 
 }

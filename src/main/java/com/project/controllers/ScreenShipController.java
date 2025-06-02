@@ -56,17 +56,17 @@ public class ScreenShipController {
             Platform.runLater(() -> {
                 if (root.getScene() != null) {
                     root.getScene().getWindow().setOnCloseRequest(event -> {
-                        System.out.println("[SCREEN SHIP]: Window closing - disconnecting battleship client");
+                        System.out.println("[SCREEN SHIP]: Window closing - forcing battleship client disconnect");
                         if (battleshipClient != null) {
-                            battleshipClient.disconnect();
+                            // KRYTYCZNE: Wymuś natychmiastowe rozłączenie
+                            forceDisconnect();
                         }
                     });
 
-                    // Dodaj też obsługę ukrywania okna
                     root.getScene().getWindow().setOnHiding(event -> {
-                        System.out.println("[SCREEN SHIP]: Window hiding - disconnecting battleship client");
+                        System.out.println("[SCREEN SHIP]: Window hiding - forcing battleship client disconnect");
                         if (battleshipClient != null) {
-                            battleshipClient.disconnect();
+                            forceDisconnect();
                         }
                     });
                 }
@@ -545,6 +545,27 @@ public class ScreenShipController {
                 });
             }
         });
+    }
+    private void forceDisconnect() {
+        System.out.println("[SCREEN SHIP]: === FORCING IMMEDIATE DISCONNECT ===");
+
+        if (battleshipClient != null) {
+            // Wyłącz running flag
+            battleshipClient.disconnect();
+
+            // Dodatkowe wymuszenie przez nullowanie referencji
+            battleshipClient = null;
+        }
+
+        // Sprawdź czy gra była w trakku i powinniśmy ją zapauzować
+        if (currentGame != null &&
+                (currentGame.getState() == com.project.models.battleship.GameState.PLAYING)) {
+
+            System.out.println("[SCREEN SHIP]: Game was in progress - marking for pause");
+            // To zostanie wykryte przez serwer gdy connection się zamknie
+        }
+
+        System.out.println("[SCREEN SHIP]: === FORCED DISCONNECT COMPLETE ===");
     }
 
 }
