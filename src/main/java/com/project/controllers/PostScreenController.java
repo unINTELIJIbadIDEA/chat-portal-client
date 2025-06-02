@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -61,6 +62,7 @@ public class PostScreenController {
 
             Stage newStage = new Stage();
             newStage.setTitle("TextPortal");
+            newStage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
             newStage.setScene(new Scene(root));
             newStage.show();
 
