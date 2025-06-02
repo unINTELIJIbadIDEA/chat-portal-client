@@ -88,6 +88,27 @@ public class ChatController {
     // NOWA METODA - tworzenie gry w statki
     private void createBattleshipGame() {
         try {
+            // Najpierw sprawdź czy nie ma pauzowanej gry
+            HttpRequest pausedGamesRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(BATTLESHIP_API_URL + "/chat/" + chatId + "/resume"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                    .build();
+
+            HttpResponse<String> pausedResponse = httpClient.send(pausedGamesRequest, HttpResponse.BodyHandlers.ofString());
+
+            if (pausedResponse.statusCode() == 200) {
+                // Znaleziono pauzowaną grę - wznów ją
+                JsonObject responseData = JsonParser.parseString(pausedResponse.body()).getAsJsonObject();
+                Platform.runLater(() -> {
+                    System.out.println("Resuming paused game...");
+                    openBattleshipWindow(responseData);
+                });
+                return;
+            }
+
+            // Nie ma pauzowanej gry - utwórz nową
             String requestBody = gson.toJson(Map.of(
                     "gameName", "Gra w statki - " + chatId,
                     "chatId", chatId
@@ -112,7 +133,6 @@ public class ChatController {
 
                 if ("rejoin".equals(action)) {
                     Platform.runLater(() -> {
-                        // Automatycznie otwórz okno gry
                         System.out.println("Rejoining existing game...");
                         openBattleshipWindow(responseData);
                     });

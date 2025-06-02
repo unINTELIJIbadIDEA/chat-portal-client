@@ -307,6 +307,19 @@ public class ScreenShipController {
     }
 
     private void updateStatusAfterShot(ShotResultMessage shotResult) {
+        if (currentGame != null && currentGame.getState() == GameState.PAUSED) {
+            if (statusLabel != null) {
+                statusLabel.setText("⏸️ Gra zapauzowana - przeciwnik się rozłączył");
+                statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn", "game-finished");
+                statusLabel.getStyleClass().add("game-paused");
+            }
+            isMyTurn = false;
+            disableAllEnemyBoard();
+
+            Platform.runLater(() -> showGamePausedAlert());
+            return;
+        }
+
         if (statusLabel != null) {
             if (shotResult.getShooterId() == playerId) {
                 // Nasz strzał
@@ -502,4 +515,27 @@ public class ScreenShipController {
             }
         }
     }
+
+    private void showGamePausedAlert() {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle("Gra zapauzowana");
+        alert.setHeaderText(null);
+        alert.setContentText("Przeciwnik się rozłączył. Gra została zapauzowana.\nMożesz wrócić do niej później przez przycisk '🚢 Gra' w czacie.");
+
+        alert.getButtonTypes().clear();
+        alert.getButtonTypes().addAll(javafx.scene.control.ButtonType.OK,
+                new javafx.scene.control.ButtonType("Zamknij grę"));
+
+        alert.showAndWait().ifPresent(buttonType -> {
+            if (buttonType.getText().equals("Zamknij grę")) {
+                Platform.runLater(() -> {
+                    if (statusLabel != null && statusLabel.getScene() != null) {
+                        javafx.stage.Stage stage = (javafx.stage.Stage) statusLabel.getScene().getWindow();
+                        stage.close();
+                    }
+                });
+            }
+        });
+    }
+
 }

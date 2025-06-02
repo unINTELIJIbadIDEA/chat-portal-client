@@ -4,5 +4,5 @@ public enum GameState {
     WAITING_FOR_PLAYERS,
     SHIP_PLACEMENT,
     PLAYING,
-    FINISHED
+    PAUSED, FINISHED
 }
