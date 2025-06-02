@@ -311,11 +311,30 @@ public class RoomScreenController {
             gameWindowOpened = true;
             System.out.println("[ROOM CONTROLLER]: Opening game window for player: " + playerId);
 
-            // Użyj Platform.runLater z opóźnieniem dla płynności
+            // POPRAWKA: Sprawdź czy waitingLabel i scene są dostępne
             Platform.runLater(() -> {
                 try {
-                    Thread.sleep(300); // Krótkie opóźnienie
-                    openGameWindow();
+                    if (waitingLabel != null && waitingLabel.getScene() != null && waitingLabel.getScene().getWindow() != null) {
+                        Thread.sleep(300);
+                        openGameWindow();
+                    } else {
+                        System.err.println("[ROOM CONTROLLER]: Cannot open game window - scene or window is null");
+                        // Spróbuj ponownie za chwilę
+                        Platform.runLater(() -> {
+                            try {
+                                Thread.sleep(1000);
+                                if (waitingLabel != null && waitingLabel.getScene() != null && waitingLabel.getScene().getWindow() != null) {
+                                    openGameWindow();
+                                } else {
+                                    System.err.println("[ROOM CONTROLLER]: Still cannot open game window - forcing window close");
+                                    gameWindowOpened = false; // Reset flagi
+                                }
+                            } catch (Exception e) {
+                                System.err.println("[ROOM CONTROLLER]: Error in delayed game window open: " + e.getMessage());
+                                gameWindowOpened = false;
+                            }
+                        });
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     gameWindowOpened = false; // Reset flagi w przypadku błędu
@@ -363,13 +382,29 @@ public class RoomScreenController {
         try {
             System.out.println("[ROOM CONTROLLER]: Opening game window for player: " + playerId);
 
-            if (waitingLabel == null || waitingLabel.getScene() == null) {
-                System.err.println("[ROOM CONTROLLER]: Cannot get current stage");
+            // POPRAWKA: Dodaj dodatkowe sprawdzenia
+            if (waitingLabel == null) {
+                System.err.println("[ROOM CONTROLLER]: waitingLabel is null - cannot get stage");
+                gameWindowOpened = false;
                 return;
             }
 
+            if (waitingLabel.getScene() == null) {
+                System.err.println("[ROOM CONTROLLER]: Scene is null - cannot get stage");
+                gameWindowOpened = false;
+                return;
+            }
+
+            if (waitingLabel.getScene().getWindow() == null) {
+                System.err.println("[ROOM CONTROLLER]: Window is null - cannot get stage");
+                gameWindowOpened = false;
+                return;
+            }
+
+            Stage currentStage = (Stage) waitingLabel.getScene().getWindow();
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/project/screenship.fxml"));
-            Parent root = loader.load();
+            Scene scene = new Scene(loader.load());
 
             ScreenShipController controller = loader.getController();
             if (controller != null) {
@@ -377,15 +412,19 @@ public class RoomScreenController {
                 System.out.println("[ROOM CONTROLLER]: Game controller initialized");
             }
 
-            Stage stage = (Stage) waitingLabel.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Gra w statki - Rozgrywka (Gracz " + playerId + ")");
+            currentStage.setScene(scene);
+            currentStage.setTitle("Gra w statki - Rozgrywka (Gracz " + playerId + ")");
 
             System.out.println("[ROOM CONTROLLER]: Game window opened successfully");
 
         } catch (IOException e) {
             e.printStackTrace();
+            gameWindowOpened = false; // Reset flagi w przypadku błędu
             System.err.println("[ROOM CONTROLLER]: Error opening game window: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            gameWindowOpened = false;
+            System.err.println("[ROOM CONTROLLER]: Unexpected error opening game window: " + e.getMessage());
         }
     }
 

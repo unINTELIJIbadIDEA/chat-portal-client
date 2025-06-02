@@ -1,11 +1,15 @@
 package com.project.controllers;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.project.client.BattleshipClient;
 import com.project.models.battleship.*;
 import com.project.models.battleship.messages.ShipSunkMessage;
 import com.project.models.battleship.messages.TakeShotMessage;
 import com.project.models.battleship.messages.ShotResultMessage;
 import com.project.models.battleship.messages.GameUpdateMessage;
+import com.project.utils.Config;
+import com.project.utils.SessionManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +25,10 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 
 public class ScreenShipController {
@@ -45,6 +53,8 @@ public class ScreenShipController {
     private boolean gameFinished = false;
     private Label statusLabel;
     private BattleshipGame currentGame;
+    private String playerNickname = "";
+    private String opponentNickname = "";
 
     @FXML
     public void initialize() {
@@ -52,24 +62,9 @@ public class ScreenShipController {
             backgroundImage.fitWidthProperty().bind(root.widthProperty());
             backgroundImage.fitHeightProperty().bind(root.heightProperty());
 
-            // Obsługa zamykania okna
+            // POPRAWKA: Opóźnij ustawienie obsługi zamknięcia okna
             Platform.runLater(() -> {
-                if (root.getScene() != null) {
-                    root.getScene().getWindow().setOnCloseRequest(event -> {
-                        System.out.println("[SCREEN SHIP]: Window closing - forcing battleship client disconnect");
-                        if (battleshipClient != null) {
-                            // KRYTYCZNE: Wymuś natychmiastowe rozłączenie
-                            forceDisconnect();
-                        }
-                    });
-
-                    root.getScene().getWindow().setOnHiding(event -> {
-                        System.out.println("[SCREEN SHIP]: Window hiding - forcing battleship client disconnect");
-                        if (battleshipClient != null) {
-                            forceDisconnect();
-                        }
-                    });
-                }
+                setupWindowCloseHandlers();
             });
         }
 
@@ -105,10 +100,60 @@ public class ScreenShipController {
         }
     }
 
+    // NOWA METODA: Bezpieczne ustawienie obsługi zamknięcia okna
+    private void setupWindowCloseHandlers() {
+        try {
+            if (root != null && root.getScene() != null && root.getScene().getWindow() != null) {
+                root.getScene().getWindow().setOnCloseRequest(event -> {
+                    System.out.println("[SCREEN SHIP]: Window closing - forcing battleship client disconnect");
+                    if (battleshipClient != null) {
+                        forceDisconnect();
+                    }
+                });
+
+                root.getScene().getWindow().setOnHiding(event -> {
+                    System.out.println("[SCREEN SHIP]: Window hiding - forcing battleship client disconnect");
+                    if (battleshipClient != null) {
+                        forceDisconnect();
+                    }
+                });
+
+                System.out.println("[SCREEN SHIP]: Window close handlers set up successfully");
+            } else {
+                // Jeśli okno nie jest jeszcze gotowe, spróbuj ponownie za chwilę
+                Platform.runLater(() -> {
+                    try {
+                        Thread.sleep(500);
+                        setupWindowCloseHandlers();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                });
+            }
+        } catch (Exception e) {
+            System.err.println("[SCREEN SHIP]: Error setting up window close handlers: " + e.getMessage());
+        }
+    }
+
     public void initializeGame(String gameId, int playerId, BattleshipClient client) {
         this.gameId = gameId;
         this.playerId = playerId;
         this.battleshipClient = client;
+
+        // NOWE: Pobierz nick gracza
+        try {
+            String token = SessionManager.getInstance().getToken();
+            if (token != null) {
+                // Dekoduj token żeby uzyskać informacje o graczu
+                Integer currentUserId = extractCurrentUserId();
+                if (currentUserId != null && currentUserId == playerId) {
+                    this.playerNickname = getUserNicknameFromApi(currentUserId);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[SCREEN SHIP]: Error getting player nickname: " + e.getMessage());
+            this.playerNickname = "Gracz " + playerId;
+        }
 
         // Shutdown hook
         if (this.battleshipClient != null) {
@@ -128,6 +173,31 @@ public class ScreenShipController {
                 statusLabel.setText("Gra rozpoczęta! Oczekiwanie na dane...");
             }
         });
+    }
+
+    // NOWA METODA: Pobierz nick użytkownika z API
+    private String getUserNicknameFromApi(int userId) {
+        try {
+            String token = SessionManager.getInstance().getToken();
+            HttpClient client = HttpClient.newHttpClient();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://" + Config.getHOST_SERVER() + ":" + Config.getPORT_API() + "/api/users/" + userId))
+                    .header("Authorization", "Bearer " + token)
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                JsonObject user = JsonParser.parseString(response.body()).getAsJsonObject();
+                return user.get("nickname").getAsString();
+            }
+        } catch (Exception e) {
+            System.err.println("[SCREEN SHIP]: Error fetching user nickname: " + e.getMessage());
+        }
+
+        return "Gracz " + userId;
     }
 
     private void setupEnemyBoardClicks() {
@@ -210,6 +280,22 @@ public class ScreenShipController {
         this.currentGame = gameUpdate.getGame();
 
         Platform.runLater(() -> {
+            // NOWE: Pobierz nick przeciwnika
+            if (currentGame != null && opponentNickname.isEmpty()) {
+                int opponentId = currentGame.getPlayerBoards().keySet().stream()
+                        .filter(id -> id != playerId)
+                        .findFirst()
+                        .orElse(-1);
+
+                if (opponentId != -1) {
+                    try {
+                        opponentNickname = getUserNicknameFromApi(opponentId);
+                    } catch (Exception e) {
+                        opponentNickname = "Przeciwnik";
+                    }
+                }
+            }
+
             // Wyświetl statki gracza na jego planszy
             displayPlayerShips();
 
@@ -352,12 +438,21 @@ public class ScreenShipController {
                         isMyTurn = true;
                         break;
                     case GAME_OVER:
-                        statusLabel.setText("🎉 ZWYCIĘSTWO! 🏆 Gratulacje!");
-                        statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn");
-                        statusLabel.getStyleClass().add("game-finished");
-                        isMyTurn = false;
-                        disableAllEnemyBoard();
-                        showGameEndAlert("Zwycięstwo!", "🎉 Gratulacje! Wygrałeś grę w statki! 🏆");
+                        if (shotResult.getShooterId() == playerId) {
+                            statusLabel.setText("🎉 ZWYCIĘSTWO! 🏆 Gratulacje " + playerNickname + "!");
+                            statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn");
+                            statusLabel.getStyleClass().add("game-finished");
+                            isMyTurn = false;
+                            disableAllEnemyBoard();
+                            showGameEndAlert("Zwycięstwo!", "🎉 Gratulacje " + playerNickname + "! Wygrałeś grę w statki! 🏆");
+                        } else {
+                            statusLabel.setText("💀 PORAŻKA 💀 " + opponentNickname + " wygrał!");
+                            statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn");
+                            statusLabel.getStyleClass().add("game-finished");
+                            isMyTurn = false;
+                            disableAllEnemyBoard();
+                            showGameEndAlert("Porażka", "💀 Niestety, " + opponentNickname + " wygrał grę w statki. Spróbuj ponownie!");
+                        }
                         break;
                     case ALREADY_SHOT:
                         statusLabel.setText("To pole było już ostrzeliwane!");
@@ -385,12 +480,12 @@ public class ScreenShipController {
                         isMyTurn = true;
                         break;
                     case GAME_OVER:
-                        statusLabel.setText("💀 PORAŻKA 💀 Przeciwnik wygrał!");
+                        statusLabel.setText("💀 PORAŻKA 💀 " + opponentNickname + " wygrał!");
                         statusLabel.getStyleClass().removeAll("your-turn", "opponent-turn");
                         statusLabel.getStyleClass().add("game-finished");
                         isMyTurn = false;
                         disableAllEnemyBoard();
-                        showGameEndAlert("Porażka", "💀 Niestety, przeciwnik wygrał grę w statki. Spróbuj ponownie!");
+                        showGameEndAlert("Porażka", "💀 Niestety, " + opponentNickname + " wygrał grę w statki. Spróbuj ponownie!");
                         break;
                 }
             }
