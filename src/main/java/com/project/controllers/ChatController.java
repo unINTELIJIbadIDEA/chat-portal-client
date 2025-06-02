@@ -201,23 +201,65 @@ public class ChatController {
     // NOWA METODA - tworzenie kafelka z grą
     private HBox createGameMessageBubble(Message msg) {
         try {
-            // Parsuj dane gry z wiadomości
             String gameData = msg.content().substring("[BATTLESHIP_GAME]".length());
             JsonObject gameInfo = JsonParser.parseString(gameData).getAsJsonObject();
 
             VBox gameBox = new VBox(5);
-            gameBox.setStyle("-fx-background-color: #e3f2fd; -fx-border-color: #1976d2; -fx-border-width: 2px; -fx-border-radius: 10px; -fx-background-radius: 10px; -fx-padding: 10px;");
+
+            String status = gameInfo.get("status").getAsString();
+            String boxStyle = switch (status) {
+                case "PAUSED" -> "-fx-background-color: #fff3e0; -fx-border-color: #ff9800; -fx-border-width: 2px; -fx-border-radius: 10px; -fx-background-radius: 10px; -fx-padding: 10px;";
+                case "FINISHED" -> "-fx-background-color: #f3e5f5; -fx-border-color: #9c27b0; -fx-border-width: 2px; -fx-border-radius: 10px; -fx-background-radius: 10px; -fx-padding: 10px;";
+                case "PLAYING" -> "-fx-background-color: #e8f5e8; -fx-border-color: #4caf50; -fx-border-width: 2px; -fx-border-radius: 10px; -fx-background-radius: 10px; -fx-padding: 10px;";
+                default -> "-fx-background-color: #e3f2fd; -fx-border-color: #1976d2; -fx-border-width: 2px; -fx-border-radius: 10px; -fx-background-radius: 10px; -fx-padding: 10px;";
+            };
+            gameBox.setStyle(boxStyle);
 
             Label gameLabel = new Label("🚢 " + gameInfo.get("gameName").getAsString());
             gameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
-            Label statusLabel = new Label("Status: " + gameInfo.get("status").getAsString());
+            String statusText = switch (status) {
+                case "WAITING" -> "Oczekuje na graczy";
+                case "READY" -> "Gotowa do gry";
+                case "PLAYING" -> "W trakcie rozgrywki";
+                case "FINISHED" -> "Zakończona";
+                case "PAUSED" -> "Wstrzymana - czeka na graczy";
+                default -> status;
+            };
 
-            Button joinButton = new Button("Dołącz do gry");
-            joinButton.setStyle("-fx-background-color: #1976d2; -fx-text-fill: white; -fx-background-radius: 5px;");
-            joinButton.setOnAction(e -> joinBattleshipGame(gameInfo));
+            Label statusLabel = new Label("Status: " + statusText);
 
-            gameBox.getChildren().addAll(gameLabel, statusLabel, joinButton);
+            if (gameInfo.has("creatorName")) {
+                Label creatorLabel = new Label("Utworzona przez: " + gameInfo.get("creatorName").getAsString());
+                creatorLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+                gameBox.getChildren().add(creatorLabel);
+            }
+
+            Button actionButton = new Button();
+
+            switch (status) {
+                case "FINISHED":
+                    actionButton.setText("Gra zakończona");
+                    actionButton.setDisable(true);
+                    actionButton.setStyle("-fx-background-color: #cccccc; -fx-text-fill: #666666; -fx-background-radius: 5px;");
+                    break;
+                case "PAUSED":
+                    actionButton.setText("Wznów grę");
+                    actionButton.setStyle("-fx-background-color: #ff9800; -fx-text-fill: white; -fx-background-radius: 5px;");
+                    actionButton.setOnAction(e -> resumeBattleshipGame(gameInfo));
+                    break;
+                case "PLAYING":
+                    actionButton.setText("Dołącz do gry");
+                    actionButton.setStyle("-fx-background-color: #4caf50; -fx-text-fill: white; -fx-background-radius: 5px;");
+                    actionButton.setOnAction(e -> joinBattleshipGame(gameInfo));
+                    break;
+                default:
+                    actionButton.setText("Dołącz do gry");
+                    actionButton.setStyle("-fx-background-color: #1976d2; -fx-text-fill: white; -fx-background-radius: 5px;");
+                    actionButton.setOnAction(e -> joinBattleshipGame(gameInfo));
+            }
+
+            gameBox.getChildren().addAll(gameLabel, statusLabel, actionButton);
 
             HBox hBox = new HBox(gameBox);
             hBox.setPadding(new Insets(5, 10, 5, 10));
@@ -225,7 +267,6 @@ public class ChatController {
 
             return hBox;
         } catch (Exception e) {
-            // Jeśli parsing się nie uda, zwróć normalną wiadomość
             Label errorLabel = new Label("Gra w statki została utworzona");
             HBox hBox = new HBox(errorLabel);
             hBox.setPadding(new Insets(5, 10, 5, 10));
@@ -371,6 +412,39 @@ public class ChatController {
         alert.showAndWait();
     }
 
+    private void resumeBattleshipGame(JsonObject gameInfo) {
+        try {
+            String gameId = gameInfo.get("gameId").getAsString();
+
+            // Poprawiony URL z gameId w ścieżce
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BATTLESHIP_API_URL + "/" + gameId + "/resume"))
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                JsonObject resumeResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+                Platform.runLater(() -> {
+                    System.out.println("Resuming game...");
+                    openBattleshipWindow(resumeResponse);
+                });
+            } else {
+                System.err.println("Błąd wznawiania gry: " + response.statusCode());
+                Platform.runLater(() -> {
+                    showGameError("Błąd wznawiania gry", "Nie można wznowić tej gry");
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() -> {
+                showGameError("Błąd połączenia", "Problem z połączeniem do serwera");
+            });
+        }
+    }
 
 
 }
