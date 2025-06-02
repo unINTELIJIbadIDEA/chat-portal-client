@@ -13,9 +13,7 @@ public class ChatPortal extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        //FXMLLoader fxmlLoader = new FXMLLoader(ChatPortal.class.getResource("roomscreen.fxml"));
         FXMLLoader fxmlLoader = new FXMLLoader(ChatPortal.class.getResource("startscreen.fxml"));
-
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("TextPortal");
         stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
