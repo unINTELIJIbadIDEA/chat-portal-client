@@ -146,7 +146,7 @@ public class ChatScreenController {
 
             Stage currentStage = (Stage) logoutButton.getScene().getWindow();
             currentStage.close();
-
+            SessionManager.getInstance().clearToken();
 
         } catch (IOException e) {
             e.printStackTrace();
