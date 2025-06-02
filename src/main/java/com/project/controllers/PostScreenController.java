@@ -1,5 +1,6 @@
 package com.project.controllers;
 import com.project.ChatPortal;
+import com.project.utils.SessionManager;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -65,7 +66,7 @@ public class PostScreenController {
 
             Stage currentStage = (Stage) logoutButton.getScene().getWindow();
             currentStage.close();
-
+            SessionManager.getInstance().clearToken();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,9 +84,9 @@ public class PostScreenController {
 
             Stage stage = (Stage) chatButton.getScene().getWindow();
             stage.setScene(chatScene);
-            stage.setWidth(1920); // Szerokość okna na pełny ekran
-            stage.setHeight(1080); // Wysokość okna na pełny ekran
-            stage.setMaximized(true); // Ustawienie przed .show()
+            stage.setWidth(1920);
+            stage.setHeight(1080);
+            stage.setMaximized(true);
             stage.show();
 
         } catch (IOException e) {
