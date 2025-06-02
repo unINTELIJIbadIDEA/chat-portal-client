@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -17,10 +18,8 @@ public class ChatPortal extends Application {
 
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("TextPortal");
+        stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
         stage.setScene(scene);
-        stage.setWidth(1920);
-        stage.setHeight(1080);
-        stage.setMaximized(true);
         stage.show();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
