@@ -118,15 +118,17 @@ public class ChatScreenController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/project/sectionchat.fxml"));
             Parent root = loader.load();
 
+            SectionChatController controller = loader.getController();
+            controller.setRefreshCallback(this::loadConversations);
+
             Stage stage = new Stage();
             stage.setTitle("Dodaj nowy czat");
             stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
             stage.setResizable(false);
             stage.setScene(new Scene(root));
-            stage.showAndWait();
-
-            loadConversations(); ;
+            stage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -185,9 +187,6 @@ public class ChatScreenController {
         }
     }
 
-    public void onPostsButtonClicked(ActionEvent actionEvent) {
-
-    }
 
     @FXML
     private void onButtonHover(MouseEvent event) {

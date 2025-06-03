@@ -2,6 +2,7 @@ package com.project.controllers;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.project.ChatPortal;
 import com.project.client.BattleshipClient;
 import com.project.models.battleship.*;
 import com.project.models.battleship.messages.ShipSunkMessage;
@@ -17,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
@@ -488,6 +490,7 @@ public class ScreenShipController {
                         isMyTurn = false;
                         disableAllEnemyBoard();
                         showGameEndAlert("Porażka", "💀 Niestety, " + opponentNickname + " wygrał grę w statki. Spróbuj ponownie!");
+
                         break;
                 }
             }
