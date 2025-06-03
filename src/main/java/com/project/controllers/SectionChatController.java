@@ -60,7 +60,7 @@ public class SectionChatController {
 
             Stage stage = new Stage();
             stage.setTitle(title);
-            stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
+            stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/image/logo.png")));
             stage.setResizable(false);
             stage.setScene(new Scene(root));
             stage.show();
