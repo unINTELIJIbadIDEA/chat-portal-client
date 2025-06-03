@@ -22,7 +22,13 @@
             </image>
         </ImageView>
 
-        <BorderPane layoutX="0" layoutY="0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+        <BorderPane layoutX="0" layoutY="0"
+                    AnchorPane.topAnchor="0.0"
+                    AnchorPane.bottomAnchor="0.0"
+                    AnchorPane.leftAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0"
+                    maxHeight="1.7976931348623157E308"
+                    maxWidth="1.7976931348623157E308">
             <top>
                 <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                     <children>
@@ -37,24 +43,20 @@
             </top>
 
             <center>
-                <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" opacity="0.6" prefHeight="910.0" prefWidth="1491.0" styleClass="gridBoard" BorderPane.alignment="CENTER">
+                <StackPane styleClass="gridBoard" BorderPane.alignment="CENTER" opacity="0.6">
                     <BorderPane.margin>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="5.0" />
                     </BorderPane.margin>
                     <children>
-                        <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" StackPane.alignment="CENTER">
+                        <VBox alignment="TOP_CENTER" StackPane.alignment="CENTER" spacing="20">
                             <children>
-                                <!-- Zmień tę linię w roomscreen.fxml: -->
-
-                                <!-- MA BYĆ: -->
-                                <Label fx:id="waitingLabel" alignment="CENTER" prefHeight="18.0" prefWidth="1050.0" styleClass="headerLabel" text="Oczekiwanie na drugiego gracza" />
-
+                                <Label fx:id="waitingLabel" alignment="CENTER" styleClass="headerLabel" text="Oczekiwanie na drugiego gracza" />
                                 <ImageView fitHeight="129.0" fitWidth="129.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
                                         <Image url="@../../image/grey-9026_256.gif" />
                                     </image>
                                     <VBox.margin>
-                                        <Insets left="20.0" right="20.0" top="155.0" />
+                                        <Insets top="155.0" />
                                     </VBox.margin>
                                 </ImageView>
                             </children>

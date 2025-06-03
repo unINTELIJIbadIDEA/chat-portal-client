@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
 
-<StackPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="backgroundImage" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.ScreenShipController">
+<StackPane fx:id="root"  styleClass="backgroundImage" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.ScreenShipController">
    <stylesheets>
       <URL value="@../../style/styleShip.css" />
    </stylesheets>
@@ -29,7 +29,7 @@
 
          <!-- GÓRNY PANEL -->
          <top>
-            <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+            <StackPane BorderPane.alignment="CENTER">
                <children>
                   <Rectangle height="74.0" styleClass="headerBar" width="1490.0" StackPane.alignment="CENTER">
                      <StackPane.margin>
@@ -43,7 +43,7 @@
 
          <!-- LEWA PLANSZA -->
          <left>
-            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="910.0" prefWidth="740.0" BorderPane.alignment="CENTER">
+            <VBox BorderPane.alignment="CENTER">
                <BorderPane.margin>
                   <Insets bottom="20.0" left="20.0" right="5.0" top="5.0" />
                </BorderPane.margin>
@@ -61,7 +61,7 @@
                         </Label>
                      </children>
                   </StackPane>
-                  <StackPane fx:id="playerBoardPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="850.0" prefWidth="718.0" VBox.vgrow="ALWAYS">
+                  <StackPane fx:id="playerBoardPane"  prefWidth="718.0" VBox.vgrow="ALWAYS">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin></StackPane>
@@ -71,7 +71,7 @@
 
          <!-- PRAWA PLANSZA -->
          <right>
-            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+            <VBox BorderPane.alignment="CENTER">
                <BorderPane.margin>
                   <Insets bottom="20.0" left="5.0" right="20.0" top="5.0" />
                </BorderPane.margin>
@@ -89,7 +89,7 @@
                         </Label>
                      </children>
                   </StackPane>
-                  <StackPane fx:id="enemyBoardPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="850.0" prefWidth="718.0" VBox.vgrow="ALWAYS">
+                  <StackPane fx:id="enemyBoardPane" prefWidth="718.0" VBox.vgrow="ALWAYS">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin></StackPane>

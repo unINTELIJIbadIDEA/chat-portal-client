@@ -356,7 +356,10 @@ public class RoomScreenController {
             Stage currentStage = (Stage) waitingLabel.getScene().getWindow();
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/project/screenchoose.fxml"));
-            Scene scene = new Scene(loader.load());
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            currentStage.setScene(scene);
+            currentStage.setMaximized(true);
 
             ScreenChooseController controller = loader.getController();
             if (controller != null) {
