@@ -324,7 +324,8 @@ public class ChatController implements Initializable {
             // Otwórz w nowym oknie, nie zastępuj okna czatu
             Stage battleshipStage = new Stage();
             battleshipStage.setTitle("Gra w statki - Poczekalnia");
-            battleshipStage.setScene(new Scene(root, 1200, 800));
+            battleshipStage.setScene(new Scene(root));
+            battleshipStage.setMaximized(true);
 
             // KRYTYCZNE: Reset flagi po zamknięciu okna
             battleshipStage.setOnCloseRequest(event -> {

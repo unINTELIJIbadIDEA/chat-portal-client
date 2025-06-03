@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
 
-<StackPane fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="backgroundImage" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.ScreenChooseController">
+<StackPane fx:id="root" styleClass="backgroundImage" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.project.controllers.ScreenChooseController">
    <stylesheets>
       <URL value="@../../style/styleShip.css" />
    </stylesheets>
@@ -26,7 +26,7 @@
       </ImageView>
       <BorderPane layoutX="0" layoutY="0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
          <top>
-            <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+            <StackPane BorderPane.alignment="CENTER">
                <children>
                   <Rectangle height="74.0" styleClass="headerBar" width="1490.0" StackPane.alignment="CENTER">
                      <StackPane.margin>
@@ -38,12 +38,12 @@
             </StackPane>
          </top>
          <left>
-            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="910.0" prefWidth="740.0" BorderPane.alignment="CENTER">
+            <VBox BorderPane.alignment="CENTER">
                <BorderPane.margin>
                   <Insets bottom="20.0" left="20.0" right="5.0" top="5.0" />
                </BorderPane.margin>
                <children>
-                  <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                  <StackPane  VBox.vgrow="ALWAYS">
                      <children>
                         <Rectangle height="55.0" styleClass="boardContainer" width="730.0" StackPane.alignment="TOP_CENTER">
                            <StackPane.margin>
@@ -57,7 +57,7 @@
                         </Label>
                      </children>
                   </StackPane>
-                  <StackPane fx:id="playerBoardPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="850.0" prefWidth="718.0" VBox.vgrow="ALWAYS">
+                  <StackPane fx:id="playerBoardPane" VBox.vgrow="ALWAYS">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
@@ -66,7 +66,7 @@
             </VBox>
          </left>
          <right>
-                 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+                 <VBox  BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                          <Insets bottom="20.0" left="5.0" right="20.0" top="5.0" />
                      </BorderPane.margin>
@@ -84,7 +84,7 @@
                                  </Label>
                              </children>
                          </StackPane>
-                         <StackPane fx:id="scrollPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="850.0" prefWidth="718.0" VBox.vgrow="ALWAYS">
+                         <StackPane fx:id="scrollPane" VBox.vgrow="ALWAYS">
                              <VBox.margin>
                                  <Insets />
                              </VBox.margin></StackPane>
