@@ -8,11 +8,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.util.Duration;
 
 public class SectionChatController {
+
+    private Runnable refreshCallback;
 
     @FXML
     private Button createChatButton;
@@ -36,14 +39,18 @@ public class SectionChatController {
         addChatButton.setOnMouseReleased(this::onMouseReleased);
     }
 
+    public void setRefreshCallback(Runnable callback) {
+        this.refreshCallback = callback;
+    }
+
     private void handleCreateChat(ActionEvent event) {
-        closeCurrentWindow(event);
         openWindow("/com/project/createchat.fxml", "Create Chat");
+        closeCurrentWindow(event);
     }
 
     private void handleAddChat(ActionEvent event) {
-        closeCurrentWindow(event);
         openWindow("/com/project/addchat.fxml", "Join Chat");
+        closeCurrentWindow(event);
     }
 
     private void closeCurrentWindow(ActionEvent event) {
@@ -56,9 +63,16 @@ public class SectionChatController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
 
+            if (loader.getController() instanceof CreateChatController) {
+                ((CreateChatController) loader.getController()).setRefreshCallback(refreshCallback);
+            } else if (loader.getController() instanceof AddChatController) {
+                ((AddChatController) loader.getController()).setRefreshCallback(refreshCallback);
+            }
+
             Stage stage = new Stage();
             stage.setTitle(title);
-            stage.setResizable(false);
+            //stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.show();
 

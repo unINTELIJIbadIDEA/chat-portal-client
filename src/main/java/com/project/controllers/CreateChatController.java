@@ -18,6 +18,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class CreateChatController implements Initializable {
+    private Runnable refreshCallback;
+
     @FXML private TextField idchatField;
     @FXML private PasswordField passwordField;
     @FXML private Button createChatButton;
@@ -53,6 +55,7 @@ public class CreateChatController implements Initializable {
 
             if (response.statusCode() == 201) {
                 showAlert("Sukces", "Czat został utworzony");
+                if (refreshCallback != null) refreshCallback.run();
                 idchatField.getScene().getWindow().hide();
             } else {
                 handleErrorResponse(response.statusCode());
@@ -60,6 +63,10 @@ public class CreateChatController implements Initializable {
         } catch (Exception e) {
             showAlert("Błąd", "Problem z połączeniem: " + e.getMessage());
         }
+    }
+
+    public void setRefreshCallback(Runnable callback) {
+        this.refreshCallback = callback;
     }
 
     private void handleErrorResponse(int statusCode) {
