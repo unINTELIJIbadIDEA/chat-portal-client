@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.project.ChatPortal;
 import com.project.adapters.LocalDateTimeAdapter;
 import com.project.client.ClientSessionManager;
 import com.project.models.message.Message;
@@ -23,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -324,6 +326,7 @@ public class ChatController implements Initializable {
             // Otwórz w nowym oknie, nie zastępuj okna czatu
             Stage battleshipStage = new Stage();
             battleshipStage.setTitle("Gra w statki - Poczekalnia");
+            battleshipStage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
             battleshipStage.setScene(new Scene(root));
             battleshipStage.setMaximized(true);
 
