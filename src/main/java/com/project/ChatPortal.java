@@ -16,7 +16,7 @@ public class ChatPortal extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(ChatPortal.class.getResource("startscreen.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("TextPortal");
-        stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
+        stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/image/logo.png")));
         stage.setScene(scene);
         stage.show();
 

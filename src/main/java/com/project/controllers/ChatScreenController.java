@@ -123,7 +123,7 @@ public class ChatScreenController {
 
             Stage stage = new Stage();
             stage.setTitle("Dodaj nowy czat");
-            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/image/logo.png")));
             stage.setResizable(false);
             stage.setScene(new Scene(root));
             stage.show();
@@ -143,7 +143,7 @@ public class ChatScreenController {
 
             Stage newStage = new Stage();
             newStage.setTitle("TextPortal");
-            newStage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
+            newStage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/image/logo.png")));
             newStage.setScene(new Scene(root));
             newStage.show();
 

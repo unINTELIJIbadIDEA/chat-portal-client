@@ -62,7 +62,7 @@ public class PostScreenController {
 
             Stage newStage = new Stage();
             newStage.setTitle("TextPortal");
-            newStage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
+            newStage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/image/logo.png")));
             newStage.setScene(new Scene(root));
             newStage.show();
 
