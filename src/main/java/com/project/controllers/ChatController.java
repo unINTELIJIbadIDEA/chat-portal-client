@@ -326,7 +326,7 @@ public class ChatController implements Initializable {
             // Otwórz w nowym oknie, nie zastępuj okna czatu
             Stage battleshipStage = new Stage();
             battleshipStage.setTitle("Gra w statki - Poczekalnia");
-            battleshipStage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/Image/logo.png")));
+            battleshipStage.getIcons().add(new Image(ChatPortal.class.getResourceAsStream("/image/logo.png")));
             battleshipStage.setScene(new Scene(root));
             battleshipStage.setMaximized(true);
 
